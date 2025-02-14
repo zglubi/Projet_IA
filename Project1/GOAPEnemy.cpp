@@ -2,7 +2,7 @@
 bool State::getisAttacked() const { return isAttacked; } void State::setisAttacked(bool attack) { isAttacked = attack; }
 bool State::getplayerInSight() { return playerInSight; } void State::setplayerInSight(bool sight) { playerInSight = sight; }
 bool State::getplayerInRange() { return playerInRange; } void State::setplayerInRange(bool range) { playerInRange = range; }
-bool State::getlowHealth() { return lowHealth; }	     void State::setlowHealth(bool health) { isAttacked = health; }
+bool State::getlowHealth() { return lowHealth; }	     void State::setlowHealth(bool health) { lowHealth = health; }
 
 void State::setHp(int i) { hp = i; }
 void State::increaseHp(int i) { hp += i; }
@@ -46,10 +46,72 @@ void FleeAction::execute(State& state) {
     state.setlowHealth(false);
 }
 
-void GOAPAgent::PerformActions(State& state) {
-    cout << "perform " << state.getHp() << endl;
+vector<Action*> GOAPPlanner::Plan(State& state, Goal goal)
+{
+    vector<Action*> plan;
+
+    if (goal == Goal::Patrol) {
+        if (!state.getplayerInSight() and !state.getplayerInRange()) {
+            plan.push_back(new PatrolAction());
+        }
+    }
+    if (goal == Goal::Follow) {
+        if (state.getplayerInSight() and !state.getplayerInRange())
+            plan.push_back(new FollowAction());
+    }
+    if (goal == Goal::Attack) {
+        if (state.getplayerInRange()) {
+            plan.push_back(new AttackAction());
+        }
+    }
+    if (goal == Goal::Flee) {
+        if (state.getlowHealth()) {
+            plan.push_back(new FleeAction());
+        }
+    }
+    return plan;
+}
+
+void GOAPAgent::PrintState(State& state) {
+    srand(time(0));
+    cout << "Vie: " << state.getHp() << "\n";
+    cout << "Est bas en vie: " << (state.getlowHealth() ? "Oui" : "Non") << "\n";
+    cout << "Est en vision: " << (state.getplayerInSight() ? "Oui" : "Non") << "\n";
+    cout << "Est en range: " << (state.getplayerInRange() ? "Oui" : "Non") << "\n\n";
+}
+ 
+GOAPEnemy::GOAPEnemy(int x, int y, float radius) : detectionRadius(radius), Enemy(x, y) 
+{
+    state.setHp(0);
+    shape.setOutlineColor(Color::Yellow); shape.setOutlineThickness(2); 
+}
+
+void GOAPEnemy::update(float deltaTime, Grid& grid, Player& player){
+    if (player.shape.getGlobalBounds().intersects(shape.getGlobalBounds())) {
+		if (damageClock.getElapsedTime().asSeconds() > 1) {
+            cout << state.getlowHealth()<<endl;
+            cout << "hp GOAPenemy " << state.getHp() << endl;
+            state.increaseHp(); // si rien dans () alors increaseHP(1);;
+            cout << "hp GOAPenemy " << state.getHp() << endl;
+            cout << state.getlowHealth() << endl;
+            damageClock.restart();
+		}
+	}
+    agent.PerformActions(state, shape);
+
+
+    agent.PrintState(state);
+
+}
+
+bool GOAPEnemy::isColliding(Player& player) {
+	return player.shape.getGlobalBounds().intersects(shape.getGlobalBounds());
+}
+
+void GOAPAgent::PerformActions(State& state,RectangleShape shape) {
     if (state.getHp() >= 5) {
         state.setlowHealth(true);
+        shape.setOutlineColor(Color::Cyan);
     }
     else { state.setlowHealth(false); }
 
@@ -120,56 +182,82 @@ void GOAPAgent::PerformActions(State& state) {
     //    }
     //}
 }
-vector<Action*> GOAPPlanner::Plan(State& state, Goal goal)
-{
-    vector<Action*> plan;
 
-    if (goal == Goal::Patrol) {
-        if (!state.getplayerInSight() and !state.getplayerInRange()) {
-            plan.push_back(new PatrolAction());
-        }
-    }
-    if (goal == Goal::Follow) {
-        if (state.getplayerInSight() and !state.getplayerInRange())
-            plan.push_back(new FollowAction());
-    }
-    if (goal == Goal::Attack) {
-        if (state.getplayerInRange()) {
-            plan.push_back(new AttackAction());
-        }
-    }
-    if (goal == Goal::Flee) {
-        if (state.getlowHealth()) {
-            plan.push_back(new FleeAction());
-        }
-    }
-    return plan;
+bool GOAPEnemy::detectPlayer(Vector2f playerPos) {
+    float distance = sqrt(pow(playerPos.x - shape.getPosition().x, 2) + pow(playerPos.y - shape.getPosition().y, 2));
+    if (distance < detectionRadius) { shape.setFillColor(Color::Red); }
+    else { shape.setFillColor(Color::Green); }
+    return (distance < detectionRadius);
 }
 
-void GOAPAgent::PrintState(State& state) {
-    srand(time(0));
-    cout << "Vie: " << state.getHp() << "\n";
-    cout << "Est bas en vie: " << (state.getlowHealth() ? "Oui" : "Non") << "\n";
-    cout << "Est en vision: " << (state.getplayerInSight() ? "Oui" : "Non") << "\n";
-    cout << "Est en range: " << (state.getplayerInRange() ? "Oui" : "Non") << "\n\n";
+bool GOAPEnemy::detectRangePlayer(Vector2f playerPos) {
+    float distance = sqrt(pow(playerPos.x - shape.getPosition().x, 2) + pow(playerPos.y - shape.getPosition().y, 2));
+    if (distance < detectionRadius) { attack(); }
+    return distance < detectionRadius;
 }
 
-GOAPEnemy::GOAPEnemy(int x, int y, float radius) : detectionRadius(radius), Enemy(x, y) 
-{
-    state.setHp(0);
-    shape.setOutlineColor(Color::Yellow); shape.setOutlineThickness(2); 
+void GOAPEnemy::patrol() {
+    cout << "e";
+    /* waypoints.clear();*/    
+    cout << waypoints.size();
+    static int currentWaypoint = 0;
+    Vector2f target = waypoints[currentWaypoint];
+    Vector2f direction = target - position;
+    float distance = sqrt(direction.x * direction.x + direction.y * direction.y);
+
+
+    cout << (int)shape.getPosition().x/* / 40*/ << " " << (int)shape.getPosition().y/* / 40*/ << endl;
+    if (Vector2i(shape.getPosition().x/* / 40*/, shape.getPosition().y/* / 40*/) == Vector2i(11*40, 7*40) and !reversed) {
+        cout << "eeee";
+        currentWaypoint = 0;
+        reverse(waypoints.begin(), waypoints.end());
+        reversed = true;
+    }
+    if (Vector2i(shape.getPosition().x / 40, shape.getPosition().y / 40) == Vector2i(2, 2) and reversed) {
+        currentWaypoint = 0;
+        reverse(waypoints.begin(), waypoints.end());
+        reversed = false;
+    }
+    if (distance < 5.0f) {
+        currentWaypoint = (currentWaypoint + 1) % 5000;
+    }
+    else {
+        direction /= distance;
+        position += direction * 150.0f * deltaTime;
+    }
+    shape.setPosition(position);
 }
 
-void GOAPEnemy::update(float deltaTime, Grid& grid, Player& player){
-	if (player.shape.getGlobalBounds().intersects(shape.getGlobalBounds())) {
-		if (damageClock.getElapsedTime().asSeconds() > 1) {
-			state.increaseHp(); // si rien dans () alors increaseHP(1);;
-			damageClock.restart();
-			cout << "hp GOAPenemy " << state.getHp() << endl;
-		}
-	}
+void GOAPEnemy::chase(Vector2f playerPos) {
+
+    Vector2f direction = playerPos - position;
+    float distance = std::sqrt(direction.x * direction.x + direction.y * direction.y);
+    if (shape.getPosition().y >= 350) { patrol(); }
+    if (shape.getPosition().y <= 250) { patrol(); }
+    if (shape.getPosition().x >= 600) { patrol(); }
+    if (shape.getPosition().x <= 0) { patrol(); }
+    if (distance > 0) {
+        direction /= distance;
+        position += direction * 150.0f * deltaTime;
+    }
+    shape.setPosition(position);
 }
 
-bool GOAPEnemy::isColliding(Player& player) {
-	return player.shape.getGlobalBounds().intersects(shape.getGlobalBounds());
+void GOAPEnemy::attack() { // attaquer donne des hp a l'ennemi et change la couleur en fonction de ses hp;;
+    if (attackClock.getElapsedTime().asSeconds() > 1) {
+        state.increaseHp();
+        attackClock.restart();
+    }
+}
+void GOAPEnemy::flee(Vector2f playerPos) {
+    //waypoints.clear();
+    //oppositePositionX = 2 * shape.getPosition().x - playerPos.x; // nouvelle direction de enemy = symetrie de pos du joueur par rapport a pos de enemy
+    //oppositePositionY = 2 * shape.getPosition().y - playerPos.y;
+    //for (Vector2i pos : Pathfinding::findPath(grid, Vector2i(shape.getPosition().x / 40, shape.getPosition().y / 40), Vector2i(oppositePositionX / 40, oppositePositionY / 40)))
+    //{
+    //    waypoints.push_back(Vector2f(pos));
+    //}
+    //shape.setPosition(Vector2f(oppositePositionX, oppositePositionY));
+
+    //DOESNT WORK ATM // OPPOSITEPOSITIONS TO BE REVIEW AND CORRECTED ASAP;;
 }

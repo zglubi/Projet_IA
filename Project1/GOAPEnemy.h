@@ -7,6 +7,8 @@
 #include <string>
 #include "Player.hpp"
 #include "Enemy.hpp"
+#include "Pathfinding.hpp"
+#include "Grid.hpp"
 using namespace std;
 class State {
 private:
@@ -15,7 +17,7 @@ private:
     bool playerInRange = false;
     bool lowHealth = false;
     int hp = 0;
-public:
+public: 
     bool getisAttacked() const;
     void setisAttacked(bool attack);
     bool getplayerInSight();
@@ -95,9 +97,8 @@ private:
     GOAPPlanner planner;
 
 public:
-    GOAPAgent(State& state);
 
-    void PerformActions(State& state);
+    void PerformActions(State& state, RectangleShape shape);
 
     void PrintState(State& state);
 };
@@ -107,16 +108,26 @@ class GOAPEnemy : public Enemy {
 private:
 	float detectionRadius;
 public:
+    bool reversed;
 	State state;
     AttackAction attackaction;
     FleeAction fleeaction;
     FollowAction followaction;
     PatrolAction patrolaction;
     GOAPPlanner planner;
-	Clock damageClock;
+    GOAPAgent agent;
+	Clock damageClock,researchPlayer, attackClock;
+    Vector2f position;
+    vector<Vector2f> waypoints = {};
 	GOAPEnemy(int x,int y,float radius);
 	void update(float deltaTime, Grid& grid, Player& );
 	bool isColliding(Player&);
+    bool detectPlayer(Vector2f playerPos);
+    bool detectRangePlayer(Vector2f playerPos);
+    void patrol();
+    void chase(Vector2f playerPos);
+    void attack();
+    void flee(Vector2f);
 };
 
 #endif
