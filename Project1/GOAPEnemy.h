@@ -2,7 +2,7 @@
 #include "GOAP.h"
 #include "Enemy.hpp"
 
-class GOAPEnemy {
+class GOAPEnemy : public Enemy {
 private:
 
 public:
