@@ -30,7 +30,6 @@ public:
     void decreaseHp(int i=1);
     int getHp();
 };
-extern State* state;
 class Action {
 public:
     int cost;

@@ -5,8 +5,9 @@ GOAPEnemy::GOAPEnemy(int x, int y, float radius) : detectionRadius(radius), Enem
 void GOAPEnemy::update(float deltaTime, Grid& grid, Player& player){
 	if (player.shape.getGlobalBounds().intersects(shape.getGlobalBounds())) {
 		if (damageClock.getElapsedTime().asSeconds() > 1) {
-			state.decreaseHp(1); // si rien dans () alors decreaseHP(1);;
+			state.decreaseHp(); // si rien dans () alors decreaseHP(1);;
 			damageClock.restart();
+			cout << state.getHp();
 		}
 	}
 }
