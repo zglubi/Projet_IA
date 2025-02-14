@@ -7,7 +7,6 @@
 
 using namespace std;
 
-
 class State {
 private:
     bool isAttacked = false;
