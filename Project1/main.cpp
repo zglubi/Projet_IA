@@ -25,11 +25,6 @@ int main() {
     
     sf::Clock clock;
 
-    GOAPAgent agent;
-
-    cout << "Etat initial de l'agent:\n\n";
-    agent.PrintState();
-    
     while (window.isOpen()) {
         sf::Time dt = clock.restart();
         float deltaTime = dt.asSeconds();
@@ -46,7 +41,6 @@ int main() {
         }
         for (auto& GOAPenemy : GOAPenemies) {
             GOAPenemy.update(deltaTime, grid,player);
-
         }
         
         window.clear();
@@ -59,13 +53,6 @@ int main() {
             window.draw(GOAPenemy.shape);
         }
         window.display();
-
-
-        //cout << "\nL'agent commence ses actions...\n\n";
-        //agent.PerformActions();
-
-        //cout << "\nEtat de l'agent apres avoir effectue les actions:\n\n";
-        //agent.PrintState();
     }
     return 0;
 }
