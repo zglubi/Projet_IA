@@ -3,6 +3,8 @@
 
 #include <SFML/Graphics.hpp>
 #include "Grid.hpp"
+using namespace std;
+using namespace sf;
 
 class Entity {
 public:
