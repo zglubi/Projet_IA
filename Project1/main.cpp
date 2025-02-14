@@ -19,7 +19,7 @@ int main() {
     window.setFramerateLimit(60);
     Player player(200, 400);
     std::vector<Enemy> enemies = { Enemy(100, 100), Enemy(700, 100) };
-    vector<GOAPEnemy> GOAPenemies = { GOAPEnemy(200,100), GOAPEnemy(400,200)};
+    vector<GOAPEnemy> GOAPenemies = { GOAPEnemy(200,100,100), GOAPEnemy(400,200,100)};
     Grid grid;
     grid.loadFromFile("map.txt");
     
