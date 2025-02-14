@@ -5,7 +5,6 @@
 #include "GOAP.h"
 #include "GOAPEnemy.h"
 #include "BT.hpp"
-#include "EnemyBT.hpp"
 #include <vector>
 
 using namespace sf;
@@ -18,12 +17,12 @@ const int WINDOW_HEIGHT = 600;
 int main() {
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Jeu SFML - IA Ennemis");
     window.setFramerateLimit(60);
-
     Player player(200, 400);
     std::vector<Enemy> enemies = { Enemy(100, 100), Enemy(700, 100) };
+    vector<GOAPEnemy> GOAPenemies = { GOAPEnemy(200,100), GOAPEnemy(400,200)};
     Grid grid;
     grid.loadFromFile("map.txt");
-
+    
     sf::Clock clock;
 
     GOAPAgent agent;
@@ -31,7 +30,6 @@ int main() {
     cout << "Etat initial de l'agent:\n\n";
     agent.PrintState();
     
-
     while (window.isOpen()) {
         sf::Time dt = clock.restart();
         float deltaTime = dt.asSeconds();
@@ -46,12 +44,22 @@ int main() {
         for (auto& enemy : enemies) {
             enemy.update(deltaTime, grid);
         }
-
+        for (auto& GOAPenemy : GOAPenemies) {
+            GOAPenemy.update(deltaTime, grid);
+            if (GOAPenemy.isColliding(player)) {
+                cout << "Collision";
+            }
+        }
+        
         window.clear();
         grid.draw(window);
         window.draw(player.shape);
-        for (const auto& enemy : enemies)
+        for (const auto& enemy : enemies) {
             window.draw(enemy.shape);
+        }
+        for (const auto& GOAPenemy : GOAPenemies) {
+            window.draw(GOAPenemy.shape);
+        }
         window.display();
 
 

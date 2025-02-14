@@ -47,9 +47,9 @@ void FleeAction::execute(State& state) {
     state.setlowHealth(false);
 }
 
-
 GOAPAgent::GOAPAgent() {
     state.setisAttacked(true);
+    state.setHp(0);
 }
 void GOAPAgent::PerformActions(){
     if (state.getHp() >= 3) {
@@ -69,23 +69,23 @@ void GOAPAgent::PerformActions(){
     for (auto action : plan1) {
         totalCost1 += action->gettotalCost();
         if (state.getlowHealth()) {
-            totalCost1 += 1;
+            totalCost1 += 1;// chiffres a equilibrer
         }
     }
     for (auto action : plan2) {
         totalCost2 += action->gettotalCost();
         if (state.getlowHealth()) {
-            totalCost1 += 2;
+            totalCost1 += 2;// chiffres a equilibrer
         }
     }
     for (auto action : plan3) {
         totalCost2 += action->gettotalCost();
         if (state.getlowHealth()) {
-            totalCost1 += 4;
-            state.decreaseHp(2);
+            totalCost1 += 4;// chiffres a equilibrer
+            state.decreaseHp(2);// chiffres a equilibrer
         }
         else if (!state.getlowHealth() and state.getplayerInRange()) {
-            totalCost3 -= 50;
+            totalCost3 -= 50; // chiffres a equilibrer
         }
     }
     if (totalCost1 < totalCost2 and totalCost1 < totalCost3) {

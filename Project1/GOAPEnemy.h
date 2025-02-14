@@ -6,9 +6,10 @@
 
 class GOAPEnemy : public Enemy {
 private:
-
 public:
-	GOAPEnemy(int x,int y);
+	GOAPEnemy(int x,int y,float radius);
+	void update(float deltaTime, Grid& grid);
+	bool isColliding(Player&);
 };
 
 #endif

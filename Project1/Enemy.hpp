@@ -2,6 +2,7 @@
 #define ENEMY_HPP
 
 #include "Entity.hpp"
+#include "Player.hpp"
 
 class Enemy : public Entity {
 public:

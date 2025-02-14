@@ -11,10 +11,10 @@ using namespace std;
 class State {
 private:
     bool isAttacked = false;
-    bool playerInSight;
-    bool playerInRange;
-    bool lowHealth;
-    int hp = 0;
+    bool playerInSight=false;
+    bool playerInRange=false;
+    bool lowHealth=false;
+    int hp;
 public:
 
     bool getisAttacked() const;
@@ -52,7 +52,7 @@ public:
 
 class PatrolAction : public Action {
 public:
-    PatrolAction() : Action(1) {}
+    PatrolAction() : Action(1) {}// chiffres a equilibrer
     bool canExecute( State& state) override;
     void execute(State& state) override;
     
@@ -60,7 +60,7 @@ public:
 
 class FollowAction : public Action {
 public:
-    FollowAction() : Action(2) {}
+    FollowAction() : Action(2) {}// chiffres a equilibrer
     bool canExecute( State& state);
     void execute(State& state) override;
 };
@@ -68,7 +68,7 @@ public:
 
 class AttackAction : public Action {
 public:
-    AttackAction() : Action(4) {}
+    AttackAction() : Action(4) {}// chiffres a equilibrer
     bool canExecute(State& state) override;
 
     void execute(State& state) override;
@@ -81,7 +81,7 @@ public:
     void execute(State& state) override;
 };
 enum class Goal {
-    Patrol,
+    Patrol,    
     Follow,
     Attack,
     Flee
