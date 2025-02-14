@@ -46,3 +46,19 @@ void Grid::draw(sf::RenderWindow& window) {
 Cell& Grid::getCell(int x, int y) {
     return cells[y][x];
 }
+
+vector<vector<bool>> Grid::getWalkable()
+{
+    vector<vector<bool>> walkables(GRID_HEIGHT, vector<bool>(GRID_WIDTH, true));
+    for (int i = 0; i < GRID_HEIGHT; i++)
+	{
+		for (int j = 0; j < GRID_WIDTH; j++)
+		{
+			if (cells[i][j].walkable == false)
+			{
+				walkables[i][j] = false;
+			}
+		}
+	}
+	return walkables;
+}

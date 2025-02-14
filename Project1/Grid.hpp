@@ -4,6 +4,8 @@
 #include <vector>
 #include <SFML/Graphics.hpp>
 #include <string>
+using namespace std;
+using namespace sf;
 
 const int GRID_WIDTH = 20;
 const int GRID_HEIGHT = 15;
@@ -21,6 +23,7 @@ public:
     void loadFromFile(const std::string& filename);
     void draw(sf::RenderWindow& window);
     Cell& getCell(int x, int y);
+    vector<vector<bool>> getWalkable();
 private:
     std::vector<std::vector<Cell>> cells;
 };

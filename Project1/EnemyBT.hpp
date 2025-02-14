@@ -4,10 +4,10 @@
 #include "Enemy.hpp"
 #include "BT.hpp"
 
-class EnemyBT
+class EnemyBT : public Enemy
 {
 private:
-	unique_ptr<BTNode> root;
+	unique_ptr<SelectorNode> root;
 	int hp;
 
 public:

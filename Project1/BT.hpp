@@ -9,7 +9,7 @@ enum class NodeState { SUCCESS, FAILURE, RUNNING };
 class BTNode {
 public:
     virtual ~BTNode() = default;
-    virtual NodeState execute() = 0;
+    virtual NodeState execute(int& action) = 0;
 };
 
 class SequenceNode : public BTNode {
@@ -17,7 +17,7 @@ private:
     std::vector<std::unique_ptr<BTNode>> children;
 public:
     void AddChild(std::unique_ptr<BTNode> child);
-    NodeState execute() override;
+    NodeState execute(int& action) override;
 };
 
 class SelectorNode : public BTNode {
@@ -25,7 +25,7 @@ private:
     std::vector<std::unique_ptr<BTNode>> children;
 public:
     void AddChild(std::unique_ptr<BTNode> child);
-    NodeState execute() override;
+    NodeState execute(int& action) override;
 };
 
 class Blackboard {
@@ -43,13 +43,13 @@ private:
     int expectedValue;
 public:
     ConditionNode(Blackboard& bb, const std::string& key, int value);
-    NodeState execute() override;
+    NodeState execute(int& action) override;
 };
 
 class ActionNode : public BTNode {
 private:
-    std::string actionName;
+    int actionType;
 public:
-    ActionNode(std::string name);
-    NodeState execute() override;
+    ActionNode(int type);
+    NodeState execute(int& action) override;
 };
