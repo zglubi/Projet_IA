@@ -80,6 +80,7 @@ public:
 
     void execute(State& state) override;
 };
+
 enum class Goal {
     Patrol,    
     Follow,

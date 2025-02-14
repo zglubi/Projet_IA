@@ -18,10 +18,11 @@ void Action::increasetotalCost(int i) { totalcost += i; }
 void Action::decreasetotalCost(int i) { totalcost -= i; }
 
 bool PatrolAction::canExecute(State& state)  {
-    return !state.getplayerInRange() and !state.getlowHealth();
+    return !state.getplayerInRange();
 }
 void PatrolAction::execute(State& state)  {
     cout << "L'agent patrouille.\n";
+    
 }
 
 bool FollowAction::canExecute(State& state)  {
@@ -72,23 +73,23 @@ void GOAPAgent::PerformActions(){
             totalCost1 += 1;// chiffres a equilibrer
         }
     }
-    for (auto action : plan2) {
-        totalCost2 += action->gettotalCost();
-        if (state.getlowHealth()) {
-            totalCost1 += 2;// chiffres a equilibrer
-        }
-    }
-    for (auto action : plan3) {
-        totalCost2 += action->gettotalCost();
-        if (state.getlowHealth()) {
-            totalCost1 += 4;// chiffres a equilibrer
-            state.decreaseHp(2);// chiffres a equilibrer
-        }
-        else if (!state.getlowHealth() and state.getplayerInRange()) {
-            totalCost3 -= 50; // chiffres a equilibrer
-        }
-    }
-    if (totalCost1 < totalCost2 and totalCost1 < totalCost3) {
+    //for (auto action : plan2) {
+    //    totalCost2 += action->gettotalCost();
+    //    if (state.getlowHealth()) {
+    //        totalCost1 += 2;// chiffres a equilibrer
+    //    }
+    //}
+    //for (auto action : plan3) {
+    //    totalCost2 += action->gettotalCost();
+    //    if (state.getlowHealth()) {
+    //        totalCost1 += 4;// chiffres a equilibrer
+    //        state.decreaseHp(2);// chiffres a equilibrer
+    //    }
+    //    else if (!state.getlowHealth() and state.getplayerInRange()) {
+    //        totalCost3 -= 50; // chiffres a equilibrer
+    //    }
+    //}
+    //if (totalCost1 < totalCost2 and totalCost1 < totalCost3) {
 
         for (auto action : plan1) {
             if (action->canExecute(state)) {
@@ -99,30 +100,30 @@ void GOAPAgent::PerformActions(){
             }
             delete action;  // Libérer la mémoire
         }
-    }
-    else if (totalCost2 < totalCost1 and totalCost2 < totalCost3) {
-        for (auto action : plan2) {
-            if (action->canExecute(state)) {
-                action->execute(state);  // Exécute l'action
+    //}
+    //else if (totalCost2 < totalCost1 and totalCost2 < totalCost3) {
+    //    for (auto action : plan2) {
+    //        if (action->canExecute(state)) {
+    //            action->execute(state);  // Exécute l'action
 
-            }
-            else {
-                cout << "Action impossible : " << typeid(*action).name() << "\n";
-            }
-            delete action;  // Libérer la mémoire
-        }
-    }
-    else if (totalCost3 < totalCost1 and totalCost3 < totalCost2) {
-        for (auto action : plan3) {
-            if (action->canExecute(state)) {
-                action->execute(state);  // Exécute l'action
-            }
-            else {
-                cout << "Action impossible : " << typeid(*action).name() << "\n";
-            }
-            delete action;  // Libérer la mémoire
-        }
-    }
+    //        }
+    //        else {
+    //            cout << "Action impossible : " << typeid(*action).name() << "\n";
+    //        }
+    //        delete action;  // Libérer la mémoire
+    //    }
+    //}
+    //else if (totalCost3 < totalCost1 and totalCost3 < totalCost2) {
+    //    for (auto action : plan3) {
+    //        if (action->canExecute(state)) {
+    //            action->execute(state);  // Exécute l'action
+    //        }
+    //        else {
+    //            cout << "Action impossible : " << typeid(*action).name() << "\n";
+    //        }
+    //        delete action;  // Libérer la mémoire
+    //    }
+    //}
 }
 vector<Action*> GOAPPlanner::Plan(State& initialState, Goal goal)
 {

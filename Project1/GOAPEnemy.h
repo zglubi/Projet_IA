@@ -6,6 +6,7 @@
 
 class GOAPEnemy : public Enemy {
 private:
+	float detectionRadius;
 public:
 	GOAPEnemy(int x,int y,float radius);
 	void update(float deltaTime, Grid& grid);
