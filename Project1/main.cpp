@@ -1,6 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include "Player.hpp"
-#include "Enemy.hpp"
+#include "EnemyBT.hpp"
 #include "Grid.hpp"
 #include "GOAP.h"
 #include "GOAPEnemy.h"

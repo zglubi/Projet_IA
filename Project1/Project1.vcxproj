@@ -144,6 +144,8 @@
     <ClCompile Include="GOAPEnemy.cpp" />
     <ClCompile Include="Grid.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Node.cpp" />
+    <ClCompile Include="Pathfinding.cpp" />
     <ClCompile Include="Player.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -154,6 +156,8 @@
     <ClInclude Include="GOAP.h" />
     <ClInclude Include="GOAPEnemy.h" />
     <ClInclude Include="Grid.hpp" />
+    <ClInclude Include="Node.hpp" />
+    <ClInclude Include="Pathfinding.hpp" />
     <ClInclude Include="Player.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

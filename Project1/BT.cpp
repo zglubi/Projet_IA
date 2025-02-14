@@ -4,9 +4,9 @@ void SequenceNode::AddChild(std::unique_ptr<BTNode> child) {
     children.push_back(std::move(child));
 }
 
-NodeState SequenceNode::execute() {
+NodeState SequenceNode::execute(int& action) {
     for (auto& child : children) {
-        if (child->execute() == NodeState::FAILURE) {
+        if (child->execute(action) == NodeState::FAILURE) {
             return NodeState::FAILURE;
         }
     }
@@ -17,9 +17,9 @@ void SelectorNode::AddChild(std::unique_ptr<BTNode> child) {
     children.push_back(std::move(child));
 }
 
-NodeState SelectorNode::execute() {
+NodeState SelectorNode::execute(int& action) {
     for (auto& child : children) {
-        if (child->execute() == NodeState::SUCCESS) {
+        if (child->execute(action) == NodeState::SUCCESS) {
             return NodeState::SUCCESS;
         }
     }
@@ -38,13 +38,13 @@ ConditionNode::ConditionNode(Blackboard& bb, const std::string& key, int value)
     : blackboard(bb), key(key), expectedValue(value) {
 }
 
-NodeState ConditionNode::execute() {
+NodeState ConditionNode::execute(int& action) {
     return (blackboard.GetValue(key) == expectedValue) ? NodeState::SUCCESS : NodeState::FAILURE;
 }
 
-ActionNode::ActionNode(std::string name) : actionName(name) {}
+ActionNode::ActionNode(int type) : actionType(type) {}
 
-NodeState ActionNode::execute() {
-    std::cout << "Action: " << actionName << std::endl;
+NodeState ActionNode::execute(int& action) {
+    action = actionType;
     return NodeState::SUCCESS;
 }
