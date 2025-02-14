@@ -1,7 +1,7 @@
 #include "EnemyBT.hpp"
 
 
-EnemyBT::EnemyBT()
+EnemyBT::EnemyBT(float x, float y)
 {
 
 }

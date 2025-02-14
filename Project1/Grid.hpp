@@ -25,4 +25,4 @@ private:
     std::vector<std::vector<Cell>> cells;
 };
 
-#endif      
+#endif

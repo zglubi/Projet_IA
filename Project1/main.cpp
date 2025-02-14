@@ -2,6 +2,10 @@
 #include "Player.hpp"
 #include "Enemy.hpp"
 #include "Grid.hpp"
+#include "GOAP.h"
+#include "GOAPEnemy.h"
+#include "BT.hpp"
+#include "EnemyBT.hpp"
 #include <vector>
 
 using namespace sf;
@@ -21,6 +25,12 @@ int main() {
     grid.loadFromFile("map.txt");
 
     sf::Clock clock;
+
+    GOAPAgent agent;
+
+    cout << "Etat initial de l'agent:\n\n";
+    agent.PrintState();
+    
 
     while (window.isOpen()) {
         sf::Time dt = clock.restart();
@@ -43,7 +53,13 @@ int main() {
         for (const auto& enemy : enemies)
             window.draw(enemy.shape);
         window.display();
+
+
+        //cout << "\nL'agent commence ses actions...\n\n";
+        //agent.PerformActions();
+
+        //cout << "\nEtat de l'agent apres avoir effectue les actions:\n\n";
+        //agent.PrintState();
     }
     return 0;
 }
-
