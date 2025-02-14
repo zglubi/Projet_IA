@@ -1,4 +1,9 @@
 #include "GOAP.h"
+State* State::getInstance() {
+    static State* instance = new State();
+    return instance;
+}
+State* state = State::getInstance();
 
 bool State::getisAttacked() const { return isAttacked; } void State::setisAttacked(bool attack) { isAttacked = attack; }
 bool State::getplayerInSight() { return playerInSight; } void State::setplayerInSight(bool sight) { playerInSight = sight; }

@@ -14,9 +14,9 @@ private:
     bool playerInSight=false;
     bool playerInRange=false;
     bool lowHealth=false;
-    int hp;
+    int hp=0;
 public:
-
+    static State* getInstance();
     bool getisAttacked() const;
     void setisAttacked(bool attack);
     bool getplayerInSight();
@@ -30,7 +30,7 @@ public:
     void decreaseHp(int i=1);
     int getHp();
 };
-
+extern State* state;
 class Action {
 public:
     int cost;

@@ -45,10 +45,8 @@ int main() {
             enemy.update(deltaTime, grid);
         }
         for (auto& GOAPenemy : GOAPenemies) {
-            GOAPenemy.update(deltaTime, grid);
-            if (GOAPenemy.isColliding(player)) {
-                cout << "Collision";
-            }
+            GOAPenemy.update(deltaTime, grid,player);
+
         }
         
         window.clear();
