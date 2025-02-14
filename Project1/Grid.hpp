@@ -19,6 +19,8 @@ struct Cell {
 
 class Grid {
 public:
+    std::vector<std::vector<int>> grid;
+
     Grid();
     void loadFromFile(const std::string& filename);
     void draw(sf::RenderWindow& window);
