@@ -44,9 +44,9 @@ int main() {
         for (auto& enemy : enemies) {
             enemy->update(deltaTime, grid);
         }
-        for (auto& GOAPenemy : GOAPenemies) {
+        /*for (auto& GOAPenemy : GOAPenemies) {
             GOAPenemy.update(deltaTime, grid,player);
-        }
+        }*/
         
         window.clear();
         grid.draw(window);

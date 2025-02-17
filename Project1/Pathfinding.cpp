@@ -35,16 +35,12 @@ vector<sf::Vector2i> Pathfinding::findPath(Grid& grid, sf::Vector2i start, sf::V
         visited[current->position.y][current->position.x] = true;
 
         std::vector<sf::Vector2i> neighbors;
-        if (end.x - start.x < 0 && end.y - start.y < 0)
-        {
-
             neighbors = {
                 {current->position.x, current->position.y + 1},
                 {current->position.x + 1, current->position.y},
                 {current->position.x - 1, current->position.y},
                 {current->position.x, current->position.y - 1}
             };
-        }
         bool keepGoing = false;
         for (sf::Vector2i& neighborPos : neighbors) {
             if (neighborPos.x < 0 || neighborPos.x >= GRID_WIDTH || neighborPos.y < 0 || neighborPos.y >= GRID_HEIGHT)
