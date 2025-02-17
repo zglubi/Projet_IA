@@ -4,6 +4,9 @@
 #include "Entity.hpp"
 #include "Player.hpp"
 
+extern float deltaTime;
+
+
 class Enemy : public Entity {
 public:
     static constexpr float SPEED = 100.0f;

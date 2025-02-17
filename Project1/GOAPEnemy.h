@@ -103,7 +103,6 @@ public:
     void PrintState(State& state);
 };
 
-
 class GOAPEnemy : public Enemy {
 private:
 	float detectionRadius;
