@@ -2,7 +2,6 @@
 #include <fstream>
 #include <iostream>
 
-
 Grid::Grid() {
     cells.resize(GRID_HEIGHT, std::vector<Cell>(GRID_WIDTH, { true, {0, 0}, sf::RectangleShape(sf::Vector2f(CELL_SIZE, CELL_SIZE)) }));
     for (int y = 0; y < GRID_HEIGHT; ++y) {
@@ -14,6 +13,7 @@ Grid::Grid() {
             cells[y][x].shape.setOutlineColor(sf::Color(50, 50, 50));
         }
     }
+    
 }
 
 void Grid::loadFromFile(const std::string& filename) {

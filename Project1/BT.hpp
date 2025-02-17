@@ -1,3 +1,5 @@
+#ifndef BT_HPP
+#define BT_HPP
 #include <iostream>
 #include <vector>
 #include <memory>
@@ -53,3 +55,4 @@ public:
     ActionNode(int type);
     NodeState execute(int& action) override;
 };
+#endif

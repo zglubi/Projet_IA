@@ -2,6 +2,8 @@
 #include "Player.hpp"
 #include "EnemyBT.hpp"
 #include "Grid.hpp"
+#include "GOAPEnemy.h"
+#include "BT.hpp"
 #include <vector>
 
 
@@ -42,7 +44,10 @@ int main() {
         for (auto& enemy : enemies) {
             enemy->update(deltaTime, grid);
         }
-
+        for (auto& GOAPenemy : GOAPenemies) {
+            GOAPenemy.update(deltaTime, grid,player);
+        }
+        
         window.clear();
         grid.draw(window);
         window.draw(player->shape);
