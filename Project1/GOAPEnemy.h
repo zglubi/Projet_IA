@@ -119,9 +119,9 @@ public:
     GOAPAgent agent;
     Vector2f position;
     vector<Vector2f> waypoints = {};
-	GOAPEnemy(int x,int y,float radius);
-	void update(float deltaTime, Grid& grid, Player& );
-	bool isColliding(Player&);
+	GOAPEnemy(float  x,float y,float radius);
+	void update(float deltaTime, Grid& grid, shared_ptr<Player> );
+	bool isColliding(shared_ptr<Player>);
     bool detectPlayer(Vector2f playerPos);
     bool detectRangePlayer(Vector2f playerPos);
     void attack();

@@ -26,6 +26,7 @@ int main() {
         make_shared<EnemyBT>(100, 100, blackboard, grid, player)/*,
         make_shared<EnemyBT>(700, 100, blackboard, grid, player)*/
     };
+    vector<GOAPEnemy> GOAPenemies = { GOAPEnemy(200,100,100), GOAPEnemy(400,200,100) };
     grid.loadFromFile("map.txt");
 
     Clock clock;
@@ -44,15 +45,19 @@ int main() {
         for (auto& enemy : enemies) {
             enemy->update(deltaTime, grid);
         }
-        /*for (auto& GOAPenemy : GOAPenemies) {
+        for (auto& GOAPenemy : GOAPenemies) {
             GOAPenemy.update(deltaTime, grid,player);
-        }*/
+        }
         
         window.clear();
         grid.draw(window);
         window.draw(player->shape);
         for (const auto& enemy : enemies)
             window.draw(enemy->shape);
+        
+        for (const auto& enemy : GOAPenemies)
+            window.draw(enemy.shape);
+
         window.display();
     }
     return 0;

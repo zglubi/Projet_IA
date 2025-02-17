@@ -113,14 +113,15 @@ void GOAPAgent::PrintState(State& state) {
     cout << "Est en range: " << (state.getplayerInRange() ? "Oui" : "Non") << "\n\n";
 }
  
-GOAPEnemy::GOAPEnemy(int x, int y, float radius) : detectionRadius(radius), Enemy(x, y) 
+GOAPEnemy::GOAPEnemy(float x, float y, float radius) : detectionRadius(radius), Enemy(x, y) 
 {
     position = Vector2f(x, y);
     state.setHp(0);
     shape.setOutlineColor(Color::Yellow); shape.setOutlineThickness(2); 
 }
 
-void GOAPEnemy::update(float deltaTime, Grid& grid, Player& player){
+
+void GOAPEnemy::update(float deltaTime, Grid& grid, shared_ptr<Player> player){
  //   if (player.shape.getGlobalBounds().intersects(shape.getGlobalBounds())) { // to be removed
 	//	if (damageClock.getElapsedTime().asSeconds() > 1) {
  //           cout << state.getlowHealth()<<endl;
@@ -131,8 +132,8 @@ void GOAPEnemy::update(float deltaTime, Grid& grid, Player& player){
  //           damageClock.restart();
 	//	}
 	//}
-    if (detectPlayer(player.shape.getPosition())) { state.setplayerInSight(true); } else  state.setplayerInSight(false);
-    if (detectRangePlayer(player.shape.getPosition())) { state.setplayerInRange(true); }else state.setplayerInRange(false);
+    if (detectPlayer(player->shape.getPosition())) { state.setplayerInSight(true); } else  state.setplayerInSight(false);
+    if (detectRangePlayer(player->shape.getPosition())) { state.setplayerInRange(true); }else state.setplayerInRange(false);
 
 
 
@@ -145,14 +146,14 @@ void GOAPEnemy::update(float deltaTime, Grid& grid, Player& player){
 
 
 
-    agent.PerformActions(state,shape,player.shape.getPosition());
+    agent.PerformActions(state,shape,player->shape.getPosition());
 
     agent.PrintState(state);
 
 }
 
-bool GOAPEnemy::isColliding(Player& player) {
-	return player.shape.getGlobalBounds().intersects(shape.getGlobalBounds());
+bool GOAPEnemy::isColliding(shared_ptr<Player> player) {
+	return player->shape.getGlobalBounds().intersects(shape.getGlobalBounds());
 }
 
 void GOAPAgent::PerformActions(State& state,RectangleShape& shape, Vector2f playerPos) {
