@@ -46,6 +46,7 @@ void FollowAction::execute(State& state, RectangleShape& shape,Vector2f playerPo
     }
 
     //cout << direction.x << " " << direction.y;
+
     shape.move(direction);
     //shape.setPosition(position);
 }
@@ -160,7 +161,7 @@ bool GOAPEnemy::isColliding(Player& player) {
 
 void GOAPAgent::PerformActions(State& state,RectangleShape& shape, Vector2f playerPos) {
     
-    int totalCost1 = 0, totalCost2 = 0, totalCost3 = 0;
+    int totalCost1 = 0, totalCost2 = -10, totalCost3 = 0;
     Goal goal1 = Goal::Patrol;
     Goal goal2 = Goal::Follow;
     Goal goal3 = Goal::Attack;
@@ -179,6 +180,9 @@ void GOAPAgent::PerformActions(State& state,RectangleShape& shape, Vector2f play
         totalCost2 += action->gettotalCost();
         if (state.getlowHealth()) {
             totalCost1 += 2;// chiffres a equilibrer
+        }
+        if (state.getplayerInRange()) {
+            totalCost2 += 1;
         }
     }
     for (auto action : plan3) {
