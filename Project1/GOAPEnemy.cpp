@@ -157,7 +157,7 @@ bool GOAPEnemy::isColliding(Player& player) {
 
 void GOAPAgent::PerformActions(State& state,RectangleShape& shape, Vector2f playerPos) {
     
-    int totalCost1 = 0, totalCost2 = -10, totalCost3 = 0;
+    int totalCost1 = 0, totalCost2 = 0, totalCost3 = 0;
     Goal goal1 = Goal::Patrol;
     Goal goal2 = Goal::Follow;
     Goal goal3 = Goal::Attack;
@@ -169,25 +169,28 @@ void GOAPAgent::PerformActions(State& state,RectangleShape& shape, Vector2f play
     for (auto action : plan1) {
         totalCost1 += action->gettotalCost();
         if (state.getlowHealth()) {
-            totalCost1 += 1;// chiffres a equilibrer
+            totalCost1 += 1; // moins enclin à patrol si bsa en vie, mais prefere patrol que follow si bas en vie
         }
     }
     for (auto action : plan2) {
         totalCost2 += action->gettotalCost();
         if (state.getlowHealth()) {
-            totalCost1 += 2;// chiffres a equilibrer
+            totalCost1 += 2;// moins enclin a follow si bas en vie
         }
         if (state.getplayerInRange()) {
-            totalCost2 += 1;
+            totalCost2 += 2; // si peut attaquer, préfère attaquer mais ne plus follow
+        }
+        if (state.getplayerInSight()) {
+            totalCost2 -= 5; // envie (frénétique) de follow à vue
         }
     }
     for (auto action : plan3) {
         totalCost2 += action->gettotalCost();
         if (state.getlowHealth()) {
-            totalCost1 += 2;// chiffres a equilibrer
+            totalCost1 += 2; // moins enclin à attaquer si bas en vie
         }
         else if (!state.getlowHealth() and state.getplayerInRange()) {
-            totalCost3 -= 50; // chiffres a equilibrer
+            totalCost3 -= 50; // si pas bas en vie et an range, volonté, d'attaquer, à 100%
         }
     }
     //if (totalCost1 < totalCost2 and totalCost1 < totalCost3) {
