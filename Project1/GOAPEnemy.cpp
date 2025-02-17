@@ -1,4 +1,7 @@
 #include "GOAPEnemy.h"
+
+Clock attackCD;
+
 bool State::getisAttacked() const { return isAttacked; } void State::setisAttacked(bool attack) { isAttacked = attack; }
 bool State::getplayerInSight() { return playerInSight; } void State::setplayerInSight(bool sight) { playerInSight = sight; }
 bool State::getplayerInRange() { return playerInRange; } void State::setplayerInRange(bool range) { playerInRange = range; }
@@ -19,37 +22,70 @@ void Action::decreasetotalCost(int i) { totalcost -= i; }
 bool PatrolAction::canExecute(State& state) {
     return !state.getplayerInRange();
 }
-void PatrolAction::execute(State& state) {
+void PatrolAction::execute(State& state, RectangleShape& shape, Vector2f playerPos) {
     cout << "L'agent patrouille.\n";
+    //patrol();
 }
 
 bool FollowAction::canExecute(State& state) {
     return state.getplayerInSight();
 }
-void FollowAction::execute(State& state) {
+void FollowAction::execute(State& state, RectangleShape& shape,Vector2f playerPos) {
     cout << "L'agent suit le joueur.\n";
+    Vector2f position = shape.getPosition();
+    //cout << position.x<<" "<<position.y<<endl;
+    Vector2f direction = playerPos - position;
+    float distance = std::sqrt(direction.x * direction.x + direction.y * direction.y);
+    //if (shape.getPosition().y >= 350) { patrol(); }
+    //if (shape.getPosition().y <= 250) { patrol(); }
+    //if (shape.getPosition().x >= 600) { patrol(); }
+    //if (shape.getPosition().x <= 0) { patrol(); }
+    if (distance > 0) {
+        direction /= distance;
+        position += direction * 150.0f * deltaTime;
+    }
+
+    //cout << direction.x << " " << direction.y;
+    shape.move(direction);
+    //shape.setPosition(position);
 }
 
 bool AttackAction::canExecute(State& state) {
+    cout << "test";
     return state.getplayerInRange();
 }
-void AttackAction::execute(State& state) {
+void AttackAction::execute(State& state, RectangleShape& shape, Vector2f playerPos) {
     cout << "L'agent attaque le joueur.\n";
-    state.increaseHp();
+   
+        cout << "Elapsed time: " << attackCD.getElapsedTime().asSeconds() << " seconds\n";
+        if (attackCD.getElapsedTime().asSeconds() > 1) {
+            state.increaseHp(1);  // Increase HP by 1 or a different value
+            cout << "Increasing HP!\n";  // Debug print
+            attackCD.restart();
+        
+    }
+
 }
 
 bool FleeAction::canExecute(State& state) {
     return state.getlowHealth();
 }
-void FleeAction::execute(State& state) {
+void FleeAction::execute(State& state, RectangleShape& shape, Vector2f playerPos) {
     cout << "L'agent fuit.\n";
+    if (attackCD.getElapsedTime().asSeconds() > 1) {
+        state.decreaseHp(2);// chiffres a equilibrer
+        attackCD.restart();
+    }
     state.setlowHealth(false);
 }
 
 vector<Action*> GOAPPlanner::Plan(State& state, Goal goal)
 {
     vector<Action*> plan;
-
+    // SEUIL CRITIQUE N°1 (hp>10)
+    if (state.getHp() > 10) {
+        goal = Goal::Flee;
+    }
     if (goal == Goal::Patrol) {
         if (!state.getplayerInSight() and !state.getplayerInRange()) {
             plan.push_back(new PatrolAction());
@@ -82,23 +118,37 @@ void GOAPAgent::PrintState(State& state) {
  
 GOAPEnemy::GOAPEnemy(int x, int y, float radius) : detectionRadius(radius), Enemy(x, y) 
 {
+    position = Vector2f(x, y);
     state.setHp(0);
     shape.setOutlineColor(Color::Yellow); shape.setOutlineThickness(2); 
 }
 
 void GOAPEnemy::update(float deltaTime, Grid& grid, Player& player){
-    if (player.shape.getGlobalBounds().intersects(shape.getGlobalBounds())) {
-		if (damageClock.getElapsedTime().asSeconds() > 1) {
-            cout << state.getlowHealth()<<endl;
-            cout << "hp GOAPenemy " << state.getHp() << endl;
-            state.increaseHp(); // si rien dans () alors increaseHP(1);;
-            cout << "hp GOAPenemy " << state.getHp() << endl;
-            cout << state.getlowHealth() << endl;
-            damageClock.restart();
-		}
-	}
-    agent.PerformActions(state, shape);
+ //   if (player.shape.getGlobalBounds().intersects(shape.getGlobalBounds())) { // to be removed
+	//	if (damageClock.getElapsedTime().asSeconds() > 1) {
+ //           cout << state.getlowHealth()<<endl;
+ //           cout << "hp GOAPenemy " << state.getHp() << endl;
+ //           state.increaseHp(); // si rien dans () alors increaseHP(1);;
+ //           cout << "hp GOAPenemy " << state.getHp() << endl;
+ //           cout << state.getlowHealth() << endl;
+ //           damageClock.restart();
+	//	}
+	//}
+    if (detectPlayer(player.shape.getPosition())) { state.setplayerInSight(true); } else  state.setplayerInSight(false);
+    if (detectRangePlayer(player.shape.getPosition())) { state.setplayerInRange(true); }else state.setplayerInRange(false);
 
+
+
+    color(state.getHp());
+    if (state.getHp() >= 5) {
+        state.setlowHealth(true);
+    }
+    else { state.setlowHealth(false); }
+
+
+
+
+    agent.PerformActions(state,shape,player.shape.getPosition());
 
     agent.PrintState(state);
 
@@ -108,13 +158,8 @@ bool GOAPEnemy::isColliding(Player& player) {
 	return player.shape.getGlobalBounds().intersects(shape.getGlobalBounds());
 }
 
-void GOAPAgent::PerformActions(State& state,RectangleShape shape) {
-    if (state.getHp() >= 5) {
-        state.setlowHealth(true);
-        shape.setOutlineColor(Color::Cyan);
-    }
-    else { state.setlowHealth(false); }
-
+void GOAPAgent::PerformActions(State& state,RectangleShape& shape, Vector2f playerPos) {
+    
     int totalCost1 = 0, totalCost2 = 0, totalCost3 = 0;
     Goal goal1 = Goal::Patrol;
     Goal goal2 = Goal::Follow;
@@ -130,75 +175,74 @@ void GOAPAgent::PerformActions(State& state,RectangleShape shape) {
             totalCost1 += 1;// chiffres a equilibrer
         }
     }
-    //for (auto action : plan2) {
-    //    totalCost2 += action->gettotalCost();
-    //    if (state.getlowHealth()) {
-    //        totalCost1 += 2;// chiffres a equilibrer
-    //    }
-    //}
-    //for (auto action : plan3) {
-    //    totalCost2 += action->gettotalCost();
-    //    if (state.getlowHealth()) {
-    //        totalCost1 += 4;// chiffres a equilibrer
-    //        state.decreaseHp(2);// chiffres a equilibrer
-    //    }
-    //    else if (!state.getlowHealth() and state.getplayerInRange()) {
-    //        totalCost3 -= 50; // chiffres a equilibrer
-    //    }
-    //}
+    for (auto action : plan2) {
+        totalCost2 += action->gettotalCost();
+        if (state.getlowHealth()) {
+            totalCost1 += 2;// chiffres a equilibrer
+        }
+    }
+    for (auto action : plan3) {
+        totalCost2 += action->gettotalCost();
+        if (state.getlowHealth()) {
+            totalCost1 += 2;// chiffres a equilibrer
+        }
+        else if (!state.getlowHealth() and state.getplayerInRange()) {
+            totalCost3 -= 50; // chiffres a equilibrer
+        }
+    }
     //if (totalCost1 < totalCost2 and totalCost1 < totalCost3) {
 
-    for (auto action : plan1) {
-        if (action->canExecute(state)) {
-            action->execute(state);  // Exécute l'action
+    //for (auto action : plan1) {
+    //    if (action->canExecute(state)) {
+    //        action->execute(state,shape,playerPos);  // Exécute l'action
+    //    }
+    //    else {
+    //        cout << "Action impossible : " << typeid(*action).name() << "\n";
+    //    }
+    //    delete action;  // Libérer la mémoire
+    //}
+    //}
+    if (totalCost2 < totalCost1 and totalCost2 < totalCost3) {
+        for (auto action : plan2) {
+            if (action->canExecute(state)) {
+                action->execute(state, shape, playerPos);  // Exécute l'action
+            }
+            else {
+                cout << "Action impossible : " << typeid(*action).name() << "\n";
+            }
+            delete action;  // Libérer la mémoire
         }
-        else {
-            cout << "Action impossible : " << typeid(*action).name() << "\n";
-        }
-        delete action;  // Libérer la mémoire
     }
-    //}
-    //else if (totalCost2 < totalCost1 and totalCost2 < totalCost3) {
-    //    for (auto action : plan2) {
-    //        if (action->canExecute(state)) {
-    //            action->execute(state);  // Exécute l'action
-
-    //        }
-    //        else {
-    //            cout << "Action impossible : " << typeid(*action).name() << "\n";
-    //        }
-    //        delete action;  // Libérer la mémoire
-    //    }
-    //}
-    //else if (totalCost3 < totalCost1 and totalCost3 < totalCost2) {
-    //    for (auto action : plan3) {
-    //        if (action->canExecute(state)) {
-    //            action->execute(state);  // Exécute l'action
-    //        }
-    //        else {
-    //            cout << "Action impossible : " << typeid(*action).name() << "\n";
-    //        }
-    //        delete action;  // Libérer la mémoire
-    //    }
-    //}
+    else if (totalCost3 < totalCost1 and totalCost3 < totalCost2) {
+        for (auto action : plan3) {
+            if (action->canExecute(state)) {
+                action->execute(state, shape, playerPos);  // Exécute l'action
+            }
+            else {
+                cout << "Action impossible : " << typeid(*action).name() << "\n";
+            }
+            delete action;  // Libérer la mémoire
+        }
+    }
 }
 
 bool GOAPEnemy::detectPlayer(Vector2f playerPos) {
-    float distance = sqrt(pow(playerPos.x - shape.getPosition().x, 2) + pow(playerPos.y - shape.getPosition().y, 2));
+    float distance = sqrt(pow(playerPos.x - shape.getPosition().x , 2) + pow(playerPos.y - shape.getPosition().y, 2));
     if (distance < detectionRadius) { shape.setFillColor(Color::Red); }
     else { shape.setFillColor(Color::Green); }
     return (distance < detectionRadius);
 }
 
 bool GOAPEnemy::detectRangePlayer(Vector2f playerPos) {
-    float distance = sqrt(pow(playerPos.x - shape.getPosition().x, 2) + pow(playerPos.y - shape.getPosition().y, 2));
-    if (distance < detectionRadius) { attack(); }
+    float distance = sqrt(pow(playerPos.x - shape.getPosition().x, 2) + pow(playerPos.y - shape.getPosition().y, 2)) + 50;
+    if (distance < detectionRadius) { cout << "uzu"; }
     return distance < detectionRadius;
 }
 
 void GOAPEnemy::patrol() {
+    position = shape.getPosition();
     cout << "e";
-    /* waypoints.clear();*/    
+    //waypoints.clear();
     cout << waypoints.size();
     static int currentWaypoint = 0;
     Vector2f target = waypoints[currentWaypoint];
@@ -225,22 +269,27 @@ void GOAPEnemy::patrol() {
         direction /= distance;
         position += direction * 150.0f * deltaTime;
     }
-    shape.setPosition(position);
+    //shape.setPosition(position);
+    shape.move(position);
 }
 
-void GOAPEnemy::chase(Vector2f playerPos) {
-
+void GOAPEnemy::follow(Vector2f playerPos) {
+    position = shape.getPosition();
+    //cout << position.x<<" "<<position.y<<endl;
     Vector2f direction = playerPos - position;
     float distance = std::sqrt(direction.x * direction.x + direction.y * direction.y);
-    if (shape.getPosition().y >= 350) { patrol(); }
-    if (shape.getPosition().y <= 250) { patrol(); }
-    if (shape.getPosition().x >= 600) { patrol(); }
-    if (shape.getPosition().x <= 0) { patrol(); }
+    //if (shape.getPosition().y >= 350) { patrol(); }
+    //if (shape.getPosition().y <= 250) { patrol(); }
+    //if (shape.getPosition().x >= 600) { patrol(); }
+    //if (shape.getPosition().x <= 0) { patrol(); }
     if (distance > 0) {
         direction /= distance;
         position += direction * 150.0f * deltaTime;
     }
-    shape.setPosition(position);
+    
+    //cout << direction.x << " " << direction.y;
+    shape.move(direction);
+    //shape.setPosition(position);
 }
 
 void GOAPEnemy::attack() { // attaquer donne des hp a l'ennemi et change la couleur en fonction de ses hp;;
@@ -260,4 +309,14 @@ void GOAPEnemy::flee(Vector2f playerPos) {
     //shape.setPosition(Vector2f(oppositePositionX, oppositePositionY));
 
     //DOESNT WORK ATM // OPPOSITEPOSITIONS TO BE REVIEW AND CORRECTED ASAP;;
+}
+void GOAPEnemy::color(int i) {
+    switch (i) {
+    case 0: shape.setOutlineColor(Color::Black); break;
+    case 3: shape.setOutlineColor(Color::Cyan);break;
+    case 5: shape.setOutlineColor(Color::White); break;
+    case 8: shape.setOutlineColor(Color::Yellow);;
+    case 10: shape.setOutlineColor(Color::Red); break;
+    case 15: shape.setOutlineColor(Color::Magenta);break;
+    }
 }

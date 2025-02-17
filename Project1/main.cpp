@@ -2,7 +2,6 @@
 #include "Player.hpp"
 #include "EnemyBT.hpp"
 #include "Grid.hpp"
-#include "GOAP.h"
 #include "GOAPEnemy.h"
 #include "BT.hpp"
 #include <vector>
