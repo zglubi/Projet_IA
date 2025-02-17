@@ -145,6 +145,7 @@
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="Pathfinding.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Useful.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BT.hpp" />
@@ -155,6 +156,7 @@
     <ClInclude Include="Node.hpp" />
     <ClInclude Include="Pathfinding.hpp" />
     <ClInclude Include="Player.hpp" />
+    <ClInclude Include="Useful.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

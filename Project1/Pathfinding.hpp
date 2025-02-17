@@ -8,7 +8,7 @@
 class Pathfinding {
 public:
 	Pathfinding(Grid& grid);
-    static std::vector<sf::Vector2i> findPath(Grid& grid, sf::Vector2i start, sf::Vector2i end);
+    vector<Vector2i> findPath(Grid& grid, Vector2i start, Vector2i end);
 private:
     vector<vector<bool>> gridB;
 };
