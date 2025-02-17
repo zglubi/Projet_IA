@@ -57,15 +57,11 @@ bool AttackAction::canExecute(State& state) {
 }
 void AttackAction::execute(State& state, RectangleShape& shape, Vector2f playerPos) {
     cout << "L'agent attaque le joueur.\n";
-   
-        cout << "Elapsed time: " << attackCD.getElapsedTime().asSeconds() << " seconds\n";
-        if (attackCD.getElapsedTime().asSeconds() > 1) {
-            state.increaseHp(1);  // Increase HP by 1 or a different value
-            cout << "Increasing HP!\n";  // Debug print
-            attackCD.restart();
-        
+    cout << "Elapsed time: " << attackCD.getElapsedTime().asSeconds() << " seconds\n";
+    if (attackCD.getElapsedTime().asSeconds() > 1) {
+        state.increaseHp();
+        attackCD.restart();
     }
-
 }
 
 bool FleeAction::canExecute(State& state) {
