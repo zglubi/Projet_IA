@@ -38,8 +38,9 @@ ConditionNode::ConditionNode(Blackboard& bb, const std::string& key, int value)
     : blackboard(bb), key(key), expectedValue(value) {
 }
 
-NodeState ConditionNode::execute(int& action) {
-    return (blackboard.GetValue(key) == expectedValue) ? NodeState::SUCCESS : NodeState::FAILURE;
+NodeState ConditionNode::execute(int& action) 
+{
+    return (blackboard.GetValue(key) < expectedValue) ? NodeState::SUCCESS : NodeState::FAILURE;
 }
 
 ActionNode::ActionNode(int type) : actionType(type) {}
