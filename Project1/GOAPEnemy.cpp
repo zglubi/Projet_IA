@@ -169,7 +169,7 @@ void GOAPAgent::PerformActions(State& state,RectangleShape& shape, Vector2f play
     for (auto action : plan1) {
         totalCost1 += action->gettotalCost();
         if (state.getlowHealth()) {
-            totalCost1 += 1; // moins enclin à patrol si bsa en vie, mais prefere patrol que follow si bas en vie
+            totalCost1 += 1; // moins enclin à patrol si bas en vie, mais prefere patrol que follow si bas en vie
         }
     }
     for (auto action : plan2) {
