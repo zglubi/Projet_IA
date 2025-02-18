@@ -275,6 +275,7 @@ bool GOAPEnemy::detectRangePlayer(shared_ptr<Player> player) {
     bool isColliding;
     /*float distance = sqrt(pow(playerPos.x - shape.getPosition().x, 2) + pow(playerPos.y - shape.getPosition().y, 2));
     if (distance < rangeDetectionRadius) { cout << "uzu"; }*/
+    //float distance = sqrt(pow(player.sp.x - shape.getPosition().x, 2) + pow(playerPos.y - shape.getPosition().y, 2));
     if (rangeRadiusCircle.getGlobalBounds().intersects(player->shape.getGlobalBounds())) { isColliding = true; cout << "uzu"; }
     else { isColliding = false; }
     return isColliding;
