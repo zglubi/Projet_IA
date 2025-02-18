@@ -1,5 +1,7 @@
 #include "GOAPEnemy.h"
-
+unique_ptr<Pathfinding> pathfinding;
+vector<Vector2f> patrolPath;
+vector<Vector2i> path;
 Clock attackCD;
 
 bool State::getisAttacked() const { return isAttacked; } void State::setisAttacked(bool attack) { isAttacked = attack; }
@@ -22,41 +24,67 @@ void Action::decreasetotalCost(int i) { totalcost -= i; }
 bool PatrolAction::canExecute(State& state) {
     return !state.getplayerInRange();
 }
-void PatrolAction::execute(State& state, RectangleShape& shape, Vector2f playerPos) {
+void PatrolAction::execute(State& state, RectangleShape& shape, Vector2f playerPos, shared_ptr<Player> player,Grid& grid) {
     cout << "L'agent patrouille.\n";
     //patrol();
 }
 
 bool FollowAction::canExecute(State& state) {
     return state.getplayerInSight();
-}
-void FollowAction::execute(State& state, RectangleShape& shape,Vector2f playerPos) {
+}void FollowAction::execute(State& state, RectangleShape& shape, Vector2f playerPos, shared_ptr<Player> player, Grid& grid) {
+    static bool next = false;
+    Vector2f velocity;
+    Vector2i position;
+    float SPEED = 150;
+    float stopDistance = 20.0f; // Distance at which the agent should stop moving towards the player
     cout << "L'agent suit le joueur.\n";
-    Vector2f position = shape.getPosition();
-    //cout << position.x<<" "<<position.y<<endl;
-    Vector2f direction = playerPos - position;
-    float distance = std::sqrt(direction.x * direction.x + direction.y * direction.y);
-    //if (shape.getPosition().y >= 350) { patrol(); }
-    //if (shape.getPosition().y <= 250) { patrol(); }
-    //if (shape.getPosition().x >= 600) { patrol(); }
-    //if (shape.getPosition().x <= 0) { patrol(); }
-    if (distance > 0) {
-        direction /= distance;
-        position += direction * 150.0f * deltaTime;
+
+    Vector2f direction = Vector2f(player->shape.getPosition().x - shape.getPosition().x, player->shape.getPosition().y - shape.getPosition().y);
+    float distance = sqrt(direction.x * direction.x + direction.y * direction.y);
+
+    if (distance > stopDistance) {
+        if (isPathClear(Vector2i(shape.getGlobalBounds().left / 40, shape.getGlobalBounds().top / 40), Vector2i(player->shape.getGlobalBounds().left / 40, player->shape.getGlobalBounds().top / 40), grid) &&
+            isPathClear(Vector2i((shape.getGlobalBounds().left + shape.getGlobalBounds().width) / 40, shape.getGlobalBounds().top / 40), Vector2i((player->shape.getGlobalBounds().left + player->shape.getGlobalBounds().width) / 40, player->shape.getGlobalBounds().top / 40), grid) &&
+            isPathClear(Vector2i(shape.getGlobalBounds().left / 40, (shape.getGlobalBounds().top + shape.getGlobalBounds().height) / 40), Vector2i(player->shape.getGlobalBounds().left / 40, (player->shape.getGlobalBounds().top + player->shape.getGlobalBounds().height) / 40), grid) &&
+            isPathClear(Vector2i((shape.getGlobalBounds().left + shape.getGlobalBounds().width) / 40, (shape.getGlobalBounds().top + shape.getGlobalBounds().height) / 40), Vector2i((player->shape.getGlobalBounds().left + player->shape.getGlobalBounds().width) / 40, (player->shape.getGlobalBounds().top + player->shape.getGlobalBounds().height) / 40), grid))
+        {
+            direction = Vector2f(direction.x / distance, direction.y / distance);
+            velocity = Vector2f(direction.x * SPEED, direction.y * SPEED);
+            shape.move(Vector2f(velocity.x * 0.016, velocity.y * 0.016));
+        }
+        else
+        {
+            path = pathfinding->findPath(grid, Vector2i(shape.getPosition().x / 40, shape.getPosition().y / 40), Vector2i(player->shape.getPosition().x / 40, player->shape.getPosition().y / 40));
+
+            if (path.size() > 1)
+            {
+                direction = Vector2f(path[1].x * 40 + 20 - shape.getPosition().x, path[1].y * 40 + 20 - shape.getPosition().y);
+            }
+            else if (path.size() == 1)
+            {
+                direction = Vector2f(path[0].x * 40 + 20 - shape.getPosition().x, path[0].y * 40 + 20 - shape.getPosition().y);
+            }
+            else
+            {
+                direction = Vector2f(player->shape.getPosition().x - shape.getPosition().x, player->shape.getPosition().y - shape.getPosition().y);
+            }
+
+            distance = sqrt(direction.x * direction.x + direction.y * direction.y);
+
+            if (distance > stopDistance) {
+                direction = Vector2f(direction.x / distance, direction.y / distance);
+                velocity = Vector2f(direction.x * SPEED, direction.y * SPEED);
+                shape.move(Vector2f(velocity.x * 0.016, velocity.y * 0.016));
+            }
+        }
     }
-
-    //cout << direction.x << " " << direction.y;
-
-    shape.move(direction);
-    
-    //shape.setPosition(position);
 }
 
 bool AttackAction::canExecute(State& state) {
     cout << "test";
     return state.getplayerInRange();
 }
-void AttackAction::execute(State& state, RectangleShape& shape, Vector2f playerPos) {
+void AttackAction::execute(State& state, RectangleShape& shape, Vector2f playerPos, shared_ptr<Player> player,Grid& grid) {
     cout << "L'agent attaque le joueur.\n";
     cout << "Elapsed time: " << attackCD.getElapsedTime().asSeconds() << " seconds\n";
     if (attackCD.getElapsedTime().asSeconds() > 1) {
@@ -68,7 +96,7 @@ void AttackAction::execute(State& state, RectangleShape& shape, Vector2f playerP
 bool FleeAction::canExecute(State& state) {
     return state.getlowHealth();
 }
-void FleeAction::execute(State& state, RectangleShape& shape, Vector2f playerPos) {
+void FleeAction::execute(State& state, RectangleShape& shape, Vector2f playerPos, shared_ptr<Player> player, Grid& grid) {
     cout << "L'agent fuit.\n";
     if (attackCD.getElapsedTime().asSeconds() > 1) {
         state.decreaseHp(2);// chiffres a equilibrer
@@ -123,7 +151,7 @@ GOAPEnemy::GOAPEnemy(float x, float y, float sightRadius, float rangeRadius)
 }
 
 
-void GOAPEnemy::update(float deltaTime, Grid& grid, shared_ptr<Player> player){
+void GOAPEnemy::update(Grid& grid, shared_ptr<Player> player){
  //   if (player.shape.getGlobalBounds().intersects(shape.getGlobalBounds())) { // to be removed
 	//	if (damageClock.getElapsedTime().asSeconds() > 1) {
  //           cout << state.getlowHealth()<<endl;
@@ -150,7 +178,7 @@ void GOAPEnemy::update(float deltaTime, Grid& grid, shared_ptr<Player> player){
 
 
 
-    agent.PerformActions(state,shape,player->shape.getPosition());
+    agent.PerformActions(state,shape,player->shape.getPosition(),player,grid);
 
     agent.PrintState(state);
 
@@ -160,7 +188,7 @@ bool GOAPEnemy::isColliding(shared_ptr<Player> player) {
 	return player->shape.getGlobalBounds().intersects(shape.getGlobalBounds());
 }
 
-void GOAPAgent::PerformActions(State& state,RectangleShape& shape, Vector2f playerPos) {
+void GOAPAgent::PerformActions(State& state,RectangleShape& shape, Vector2f playerPos, shared_ptr<Player> player, Grid& grid) {
     
     int totalCost1 = 0, totalCost2 = 0, totalCost3 = 0;
     Goal goal1 = Goal::Patrol;
@@ -202,7 +230,7 @@ void GOAPAgent::PerformActions(State& state,RectangleShape& shape, Vector2f play
 
     //for (auto action : plan1) {
     //    if (action->canExecute(state)) {
-    //        action->execute(state,shape,playerPos);  // Exécute l'action
+    //        action->execute(state,shape,playerPos,player);  // Exécute l'action
     //    }
     //    else {
     //        cout << "Action impossible : " << typeid(*action).name() << "\n";
@@ -213,7 +241,7 @@ void GOAPAgent::PerformActions(State& state,RectangleShape& shape, Vector2f play
     if (totalCost2 < totalCost1 and totalCost2 < totalCost3) {
         for (auto action : plan2) {
             if (action->canExecute(state)) {
-                action->execute(state, shape, playerPos);  // Exécute l'action
+                action->execute(state, shape, playerPos,player,grid);  // Exécute l'action
             }
             else {
                 cout << "Action impossible : " << typeid(*action).name() << "\n";
@@ -224,7 +252,7 @@ void GOAPAgent::PerformActions(State& state,RectangleShape& shape, Vector2f play
     else if (totalCost3 < totalCost1 and totalCost3 < totalCost2) {
         for (auto action : plan3) {
             if (action->canExecute(state)) {
-                action->execute(state, shape, playerPos);  // Exécute l'action
+                action->execute(state, shape, playerPos,player,grid);  // Exécute l'action
             }
             else {
                 cout << "Action impossible : " << typeid(*action).name() << "\n";
@@ -280,7 +308,7 @@ void GOAPEnemy::patrol() {
     }
     else {
         direction /= distance;
-        position += direction * 150.0f * deltaTime;
+        position += direction * 150.0f * 0.016f;
     }
     //shape.setPosition(position);
     shape.move(position);
@@ -297,7 +325,7 @@ void GOAPEnemy::follow(Vector2f playerPos) {
     //if (shape.getPosition().x <= 0) { patrol(); }
     if (distance > 0) {
         direction /= distance;
-        position += direction * 150.0f * deltaTime;
+        position += direction * 150.0f * 0.016f;
     }
     
     //cout << direction.x << " " << direction.y;
@@ -332,4 +360,43 @@ void GOAPEnemy::color(int i) {
     case 10: shape.setOutlineColor(Color::Red); break;
     case 15: shape.setOutlineColor(Color::Magenta);break;
     }
+}
+
+bool isPathClear(const Vector2i& start, const Vector2i& end, Grid& grid)
+{
+
+    int x1 = start.x;
+    int y1 = start.y;
+    int x2 = end.x;
+    int y2 = end.y;
+
+    int dx = abs(x2 - x1);
+    int dy = abs(y2 - y1);
+    int sx = (x1 < x2) ? 1 : -1;
+    int sy = (y1 < y2) ? 1 : -1;
+    int err = dx - dy;
+
+    while (true) {
+        // Vérifiez si la cellule est un mur
+        if (!grid.getCell(x1, y1).walkable) {
+            return false;
+        }
+
+        // Si nous avons atteint la fin du chemin
+        if (x1 == x2 && y1 == y2) {
+            break;
+        }
+
+        int e2 = 2 * err;
+        if (e2 > -dy) {
+            err -= dy;
+            x1 += sx;
+        }
+        if (e2 < dx) {
+            err += dx;
+            y1 += sy;
+        }
+    }
+
+    return true;
 }

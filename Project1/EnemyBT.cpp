@@ -166,9 +166,8 @@ void EnemyBT::flee(float deltaTime, Grid& grid)
 	cout << "Flee\n";
 }
 
-bool EnemyBT::isPathClear(const Vector2i& start, const Vector2i& end, Grid& grid) 
-{
-	
+bool EnemyBT::isPathClear(const Vector2i& start, const Vector2i& end, Grid& grid) {
+
 	int x1 = start.x;
 	int y1 = start.y;
 	int x2 = end.x;
