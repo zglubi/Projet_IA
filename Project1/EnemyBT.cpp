@@ -287,6 +287,42 @@ void EnemyBT::flee(float deltaTime, Grid& grid)
 		return gridX >= 0 && gridX < GRID_WIDTH && gridY >= 0 && gridY < GRID_HEIGHT && grid.getCell(gridX, gridY).walkable;
 		};
 
+
+	/*if (velocity.x > 0)
+	{
+		if (isWalkable(newBounds.left + newBounds.width - 1, newBounds.top) &&
+			isWalkable(newBounds.left + newBounds.width - 1, newBounds.top + newBounds.height - 1))
+		{
+			shape.move(Vector2f(velocity.x * deltaTime, 0));
+		}
+	}
+	else
+	{
+		if (isWalkable(newBounds.left, newBounds.top) &&
+			isWalkable(newBounds.left, newBounds.top + newBounds.height - 1))
+		{
+			shape.move(Vector2f(velocity.x * deltaTime, 0));
+		}
+	}
+
+	if (velocity.y > 0)
+	{
+		if (isWalkable(newBounds.left, newBounds.top + newBounds.height - 1) &&
+			isWalkable(newBounds.left + newBounds.width - 1, newBounds.top + newBounds.height - 1))
+		{
+			shape.move(Vector2f(0, velocity.x * deltaTime));
+		}
+	}
+	else
+	{
+		if (isWalkable(newBounds.left, newBounds.top) &&
+			isWalkable(newBounds.left + newBounds.width - 1, newBounds.top))
+		{
+			shape.move(Vector2f(0, velocity.x * deltaTime));
+		}
+	}*/
+
+
 	if (isWalkable(newBounds.left, newBounds.top) &&
 		isWalkable(newBounds.left + newBounds.width - 1, newBounds.top) &&
 		isWalkable(newBounds.left, newBounds.top + newBounds.height - 1) &&
