@@ -291,18 +291,17 @@ void EnemyBT::flee(float deltaTime, Grid& grid)
 		};
 
 
-	/*if (velocity.x > 0)
+	if (velocity.x > 0)
 	{
-		if (isWalkable(newBounds.left + newBounds.width - 1, newBounds.top) &&
-			isWalkable(newBounds.left + newBounds.width - 1, newBounds.top + newBounds.height - 1))
+		if (isWalkable(newBounds.left + newBounds.width - 1, shape.getGlobalBounds().top) &&
+			isWalkable(newBounds.left + newBounds.width - 1, shape.getGlobalBounds().top + shape.getGlobalBounds().height - 1))
 		{
-			shape.move(Vector2f(velocity.x * deltaTime, 0));
-		}
+			shape.move(Vector2f(velocity.x * deltaTime, 0));		}
 	}
 	else
 	{
-		if (isWalkable(newBounds.left, newBounds.top) &&
-			isWalkable(newBounds.left, newBounds.top + newBounds.height - 1))
+		if (isWalkable(newBounds.left, shape.getGlobalBounds().top) &&
+			isWalkable(newBounds.left, shape.getGlobalBounds().top + shape.getGlobalBounds().height - 1))
 		{
 			shape.move(Vector2f(velocity.x * deltaTime, 0));
 		}
@@ -310,28 +309,28 @@ void EnemyBT::flee(float deltaTime, Grid& grid)
 
 	if (velocity.y > 0)
 	{
-		if (isWalkable(newBounds.left, newBounds.top + newBounds.height - 1) &&
-			isWalkable(newBounds.left + newBounds.width - 1, newBounds.top + newBounds.height - 1))
+		if (isWalkable(shape.getGlobalBounds().left, newBounds.top + newBounds.height - 1) &&
+			isWalkable(shape.getGlobalBounds().left + shape.getGlobalBounds().width - 1, newBounds.top + newBounds.height - 1))
 		{
-			shape.move(Vector2f(0, velocity.x * deltaTime));
+			shape.move(Vector2f(0, velocity.y * deltaTime));	
 		}
 	}
 	else
 	{
-		if (isWalkable(newBounds.left, newBounds.top) &&
-			isWalkable(newBounds.left + newBounds.width - 1, newBounds.top))
+		if (isWalkable(shape.getGlobalBounds().left, newBounds.top) &&
+			isWalkable(shape.getGlobalBounds().left + shape.getGlobalBounds().width - 1, newBounds.top))
 		{
-			shape.move(Vector2f(0, velocity.x * deltaTime));
+			shape.move(Vector2f(0, velocity.y * deltaTime));
 		}
-	}*/
+	}
 
 
-	if (isWalkable(newBounds.left, newBounds.top) &&
+	/*if (isWalkable(newBounds.left, newBounds.top) &&
 		isWalkable(newBounds.left + newBounds.width - 1, newBounds.top) &&
 		isWalkable(newBounds.left, newBounds.top + newBounds.height - 1) &&
 		isWalkable(newBounds.left + newBounds.width - 1, newBounds.top + newBounds.height - 1)) {
 		shape.move(Vector2f(velocity.x * deltaTime, velocity.y * deltaTime));
-	}
+	}*/
 }
 
 bool EnemyBT::isPathClear(const Vector2i& start, const Vector2i& end, Grid& grid) {
