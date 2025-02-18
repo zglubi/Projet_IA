@@ -30,6 +30,8 @@ public:
 	void chase(float deltaTime, Grid& grid);
 
 	void flee(float deltaTime, Grid& grid);
+
+	bool isPathClear(const Vector2i& start, const Vector2i& end, Grid& grid);
 };
 
 

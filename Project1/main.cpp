@@ -23,7 +23,7 @@ int main() {
 
     shared_ptr<Player> player = make_shared<Player>(200, 400);
     vector<shared_ptr<EnemyBT>> enemies = {
-        make_shared<EnemyBT>(100, 100, blackboard, grid, player)/*,
+        make_shared<EnemyBT>(400, 400, blackboard, grid, player)/*,
         make_shared<EnemyBT>(700, 100, blackboard, grid, player)*/
     };
     grid.loadFromFile("map.txt");
