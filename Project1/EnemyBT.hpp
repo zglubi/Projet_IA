@@ -20,7 +20,7 @@ private:
 	vector<Vector2i> path;
 	Vector2i position;
 	int currentPathIndex = 0;
-	int hp;
+	float hp;
 	bool next = false;
 
 public:

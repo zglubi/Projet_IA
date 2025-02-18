@@ -28,7 +28,7 @@ EnemyBT::EnemyBT(float x, float y, float sightRadius, float rangeRadius, Blackbo
 	root->AddChild(move(patrolAction));
 
 	pathfinding = make_unique<Pathfinding>(grid);
-	hp = 10;
+	hp = 100.0f;
 	player = pl;
 
 
@@ -41,7 +41,10 @@ EnemyBT::EnemyBT(float x, float y, float sightRadius, float rangeRadius, Blackbo
 
 void EnemyBT::update(float deltaTime, Grid& grid) 
 {
-	
+	if (shape.getGlobalBounds().intersects(player->shape.getGlobalBounds()))
+		hp -= 0.1f;
+
+
 	blackboard.SetValue("hp", -hp);
 	blackboard.SetValue("vue", length(Vector2f(shape.getPosition().x - player->shape.getPosition().x, shape.getPosition().y - player->shape.getPosition().y)));
 	
@@ -209,27 +212,6 @@ void EnemyBT::chase(float deltaTime, Grid& grid)
 	}
 	else
 	{
-		for (int i = 0; i < GRID_HEIGHT; i++)
-		{
-			for (int j = 0; j < GRID_WIDTH; j++)
-			{
-				if (grid.getCell(j, i).walkable == false)
-				{
-					grid.getCell(j, i).shape.setFillColor(sf::Color::White);
-				}
-				else
-				{
-					grid.getCell(j, i).shape.setFillColor(sf::Color::Black);
-				}
-			}
-		}
-
-		for (auto cell : path)
-		{
-			grid.getCell(cell.x, cell.y).shape.setFillColor(sf::Color::Green);
-		}
-
-
 		if (position != Vector2i(shape.getPosition().x / 40, shape.getPosition().y / 40))
 		{
 			position = Vector2i(shape.getPosition().x / 40, shape.getPosition().y / 40);
