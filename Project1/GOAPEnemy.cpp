@@ -98,7 +98,27 @@ bool FleeAction::canExecute(State& state) {
 }
 void FleeAction::execute(State& state, RectangleShape& shape, Vector2f playerPos, shared_ptr<Player> player, Grid& grid) {
     cout << "L'agent fuit.\n";
-    if (attackCD.getElapsedTime().asSeconds() > 1) {
+    float SPEED = 150.f;
+    Vector2f direction = Vector2f(shape.getPosition().x - player->shape.getPosition().x, shape.getPosition().y - player->shape.getPosition().y);
+    direction = Vector2f(direction.x / length(direction), direction.y / length(direction));
+    Vector2f velocity = Vector2f(direction.x * SPEED, direction.y * SPEED);
+
+    Vector2f newPosition = Vector2f(shape.getGlobalBounds().left, shape.getGlobalBounds().top) + velocity;
+    FloatRect newBounds(newPosition, shape.getSize());
+
+    auto isWalkable = [&](float x, float y) {
+        int gridX = static_cast<int>(x / CELL_SIZE);
+        int gridY = static_cast<int>(y / CELL_SIZE);
+        return gridX >= 0 && gridX < GRID_WIDTH && gridY >= 0 && gridY < GRID_HEIGHT && grid.getCell(gridX, gridY).walkable;
+        };
+
+    if (isWalkable(newBounds.left, newBounds.top) &&
+        isWalkable(newBounds.left + newBounds.width - 1, newBounds.top) &&
+        isWalkable(newBounds.left, newBounds.top + newBounds.height - 1) &&
+        isWalkable(newBounds.left + newBounds.width - 1, newBounds.top + newBounds.height - 1)) {
+        shape.move(Vector2f(velocity.x * 0.016, velocity.y * 0.016));
+    }
+    if (attackCD.getElapsedTime().asSeconds() > 5) {
         state.decreaseHp(2);// chiffres a equilibrer
         attackCD.restart();
     }
@@ -170,7 +190,7 @@ void GOAPEnemy::update(Grid& grid, shared_ptr<Player> player){
 
 
     color(state.getHp());
-    if (state.getHp() >= 5) {
+    if (state.getHp() >= 11) {
         state.setlowHealth(true);
     }
     else { state.setlowHealth(false); }
