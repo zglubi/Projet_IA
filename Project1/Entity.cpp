@@ -5,4 +5,5 @@ Entity::Entity(float x, float y, sf::Color color) {
     shape.setPosition(x, y);
     shape.setFillColor(color);
     shape.setOrigin(shape.getSize() / 2.f);
+
 }

@@ -11,7 +11,7 @@ void Player::update(float deltaTime, Grid& grid) {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) movement.x -= SPEED * deltaTime;
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) movement.x += SPEED * deltaTime;
 
-    sf::Vector2f newPosition = shape.getPosition() + movement;
+    sf::Vector2f newPosition = Vector2f (shape.getGlobalBounds().left , shape.getGlobalBounds().top) + movement;
     sf::FloatRect newBounds(newPosition, shape.getSize());
 
     // Vérifier les quatre coins du joueur

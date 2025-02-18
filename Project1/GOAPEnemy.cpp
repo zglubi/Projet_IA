@@ -48,6 +48,7 @@ void FollowAction::execute(State& state, RectangleShape& shape,Vector2f playerPo
     //cout << direction.x << " " << direction.y;
 
     shape.move(direction);
+    
     //shape.setPosition(position);
 }
 
@@ -113,14 +114,16 @@ void GOAPAgent::PrintState(State& state) {
     cout << "Est en range: " << (state.getplayerInRange() ? "Oui" : "Non") << "\n\n";
 }
  
-GOAPEnemy::GOAPEnemy(int x, int y, float radius) : detectionRadius(radius), Enemy(x, y) 
+GOAPEnemy::GOAPEnemy(float x, float y, float sightRadius, float rangeRadius) 
+    : sightDetectionRadius(sightRadius), rangeDetectionRadius(rangeRadius), Enemy(x, y, sightRadius, rangeRadius)
 {
     position = Vector2f(x, y);
     state.setHp(0);
     shape.setOutlineColor(Color::Yellow); shape.setOutlineThickness(2); 
 }
 
-void GOAPEnemy::update(float deltaTime, Grid& grid, Player& player){
+
+void GOAPEnemy::update(float deltaTime, Grid& grid, shared_ptr<Player> player){
  //   if (player.shape.getGlobalBounds().intersects(shape.getGlobalBounds())) { // to be removed
 	//	if (damageClock.getElapsedTime().asSeconds() > 1) {
  //           cout << state.getlowHealth()<<endl;
@@ -131,8 +134,10 @@ void GOAPEnemy::update(float deltaTime, Grid& grid, Player& player){
  //           damageClock.restart();
 	//	}
 	//}
-    if (detectPlayer(player.shape.getPosition())) { state.setplayerInSight(true); } else  state.setplayerInSight(false);
-    if (detectRangePlayer(player.shape.getPosition())) { state.setplayerInRange(true); }else state.setplayerInRange(false);
+    sightRadiusCircle.setPosition(shape.getPosition().x, shape.getPosition().y);
+    rangeRadiusCircle.setPosition(shape.getPosition().x, shape.getPosition().y);
+    if (detectPlayer(player)) { state.setplayerInSight(true); } else  state.setplayerInSight(false);
+    if (detectRangePlayer(player)) { state.setplayerInRange(true); }else state.setplayerInRange(false);
 
 
 
@@ -145,14 +150,14 @@ void GOAPEnemy::update(float deltaTime, Grid& grid, Player& player){
 
 
 
-    agent.PerformActions(state,shape,player.shape.getPosition());
+    agent.PerformActions(state,shape,player->shape.getPosition());
 
     agent.PrintState(state);
 
 }
 
-bool GOAPEnemy::isColliding(Player& player) {
-	return player.shape.getGlobalBounds().intersects(shape.getGlobalBounds());
+bool GOAPEnemy::isColliding(shared_ptr<Player> player) {
+	return player->shape.getGlobalBounds().intersects(shape.getGlobalBounds());
 }
 
 void GOAPAgent::PerformActions(State& state,RectangleShape& shape, Vector2f playerPos) {
@@ -169,7 +174,7 @@ void GOAPAgent::PerformActions(State& state,RectangleShape& shape, Vector2f play
     for (auto action : plan1) {
         totalCost1 += action->gettotalCost();
         if (state.getlowHealth()) {
-            totalCost1 += 1; // moins enclin à patrol si bsa en vie, mais prefere patrol que follow si bas en vie
+            totalCost1 += 1; // moins enclin à patrol si bas en vie, mais prefere patrol que follow si bas en vie
         }
     }
     for (auto action : plan2) {
@@ -229,17 +234,22 @@ void GOAPAgent::PerformActions(State& state,RectangleShape& shape, Vector2f play
     }
 }
 
-bool GOAPEnemy::detectPlayer(Vector2f playerPos) {
-    float distance = sqrt(pow(playerPos.x - shape.getPosition().x , 2) + pow(playerPos.y - shape.getPosition().y, 2));
-    if (distance < detectionRadius) { shape.setFillColor(Color::Red); }
-    else { shape.setFillColor(Color::Green); }
-    return (distance < detectionRadius);
+bool GOAPEnemy::detectPlayer(shared_ptr<Player> player) {
+    bool isColliding;
+    //float distance = sqrt(pow(playerPos.x - shape.getPosition().x , 2) + pow(playerPos.y - shape.getPosition().y, 2));
+    //if (distance < sightDetectionRadius) { shape.setFillColor(Color::Red); }*
+    if (sightRadiusCircle.getGlobalBounds().intersects(player->shape.getGlobalBounds())) { isColliding = true; shape.setFillColor(Color::Green); }
+    else { isColliding = false; shape.setFillColor(Color::Green); }
+    return (isColliding);
 }
 
-bool GOAPEnemy::detectRangePlayer(Vector2f playerPos) {
-    float distance = sqrt(pow(playerPos.x - shape.getPosition().x, 2) + pow(playerPos.y - shape.getPosition().y, 2)) + 50;
-    if (distance < detectionRadius) { cout << "uzu"; }
-    return distance < detectionRadius;
+bool GOAPEnemy::detectRangePlayer(shared_ptr<Player> player) {
+    bool isColliding;
+    /*float distance = sqrt(pow(playerPos.x - shape.getPosition().x, 2) + pow(playerPos.y - shape.getPosition().y, 2));
+    if (distance < rangeDetectionRadius) { cout << "uzu"; }*/
+    if (rangeRadiusCircle.getGlobalBounds().intersects(player->shape.getGlobalBounds())) { isColliding = true; cout << "uzu"; }
+    else { isColliding = false; }
+    return isColliding;
 }
 
 void GOAPEnemy::patrol() {
