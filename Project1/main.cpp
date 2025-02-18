@@ -26,7 +26,7 @@ int main() {
         make_shared<EnemyBT>(400, 400,100,50, blackboard, grid, player)/*,
         make_shared<EnemyBT>(700, 100, blackboard, grid, player)*/
     };
-    vector<GOAPEnemy> GOAPenemies = { GOAPEnemy(200,100,150,50), GOAPEnemy(400,200,100,50) };
+    vector<GOAPEnemy> GOAPenemies = { GOAPEnemy(200,100,100,50), GOAPEnemy(400,200,100,50) };
     grid.loadFromFile("map.txt");
 
     Clock clock;

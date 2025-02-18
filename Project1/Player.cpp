@@ -21,6 +21,7 @@ void Player::update(float deltaTime, Grid& grid) {
         return gridX >= 0 && gridX < GRID_WIDTH && gridY >= 0 && gridY < GRID_HEIGHT && grid.getCell(gridX, gridY).walkable;
         };
 
+
     if (isWalkable(newBounds.left, newBounds.top) &&
         isWalkable(newBounds.left + newBounds.width - 1, newBounds.top) &&
         isWalkable(newBounds.left, newBounds.top + newBounds.height - 1) &&

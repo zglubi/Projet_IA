@@ -103,7 +103,7 @@ void FleeAction::execute(State& state, RectangleShape& shape, Vector2f playerPos
     direction = Vector2f(direction.x / length(direction), direction.y / length(direction));
     Vector2f velocity = Vector2f(direction.x * SPEED, direction.y * SPEED);
 
-    Vector2f newPosition = Vector2f(shape.getGlobalBounds().left, shape.getGlobalBounds().top) + velocity;
+    Vector2f newPosition = Vector2f(shape.getGlobalBounds().left, shape.getGlobalBounds().top) + velocity * 0.016f;
     FloatRect newBounds(newPosition, shape.getSize());
 
     auto isWalkable = [&](float x, float y) {
@@ -112,13 +112,49 @@ void FleeAction::execute(State& state, RectangleShape& shape, Vector2f playerPos
         return gridX >= 0 && gridX < GRID_WIDTH && gridY >= 0 && gridY < GRID_HEIGHT && grid.getCell(gridX, gridY).walkable;
         };
 
-    if (isWalkable(newBounds.left, newBounds.top) &&
+
+    if (velocity.x > 0)
+    {
+        if (isWalkable(newBounds.left + newBounds.width - 1, shape.getGlobalBounds().top) &&
+            isWalkable(newBounds.left + newBounds.width - 1, shape.getGlobalBounds().top + shape.getGlobalBounds().height - 1))
+        {
+            shape.move(Vector2f(velocity.x * 0.016, 0));
+        }
+    }
+    else
+    {
+        if (isWalkable(newBounds.left, shape.getGlobalBounds().top) &&
+            isWalkable(newBounds.left, shape.getGlobalBounds().top + shape.getGlobalBounds().height - 1))
+        {
+            shape.move(Vector2f(velocity.x * 0.016, 0));
+        }
+    }
+
+    if (velocity.y > 0)
+    {
+        if (isWalkable(shape.getGlobalBounds().left, newBounds.top + newBounds.height - 1) &&
+            isWalkable(shape.getGlobalBounds().left + shape.getGlobalBounds().width - 1, newBounds.top + newBounds.height - 1))
+        {
+            shape.move(Vector2f(0, velocity.y * 0.016));
+        }
+    }
+    else
+    {
+        if (isWalkable(shape.getGlobalBounds().left, newBounds.top) &&
+            isWalkable(shape.getGlobalBounds().left + shape.getGlobalBounds().width - 1, newBounds.top))
+        {
+            shape.move(Vector2f(0, velocity.y * 0.016));
+        }
+    }
+
+
+    /*if (isWalkable(newBounds.left, newBounds.top) &&
         isWalkable(newBounds.left + newBounds.width - 1, newBounds.top) &&
         isWalkable(newBounds.left, newBounds.top + newBounds.height - 1) &&
         isWalkable(newBounds.left + newBounds.width - 1, newBounds.top + newBounds.height - 1)) {
         shape.move(Vector2f(velocity.x * 0.016, velocity.y * 0.016));
-    }
-    if (attackCD.getElapsedTime().asSeconds() > 5) {
+    }*/
+    if (attackCD.getElapsedTime().asSeconds() > 10) {
         state.decreaseHp(2);// chiffres a equilibrer
         attackCD.restart();
     }
