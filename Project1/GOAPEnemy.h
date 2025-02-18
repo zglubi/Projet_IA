@@ -37,7 +37,7 @@ public:
     int cost;
     Action(int c) :cost(c) {};
     virtual bool canExecute(State& state) = 0;
-    virtual void execute(State& state, RectangleShape& shape, Vector2f playerPos) = 0;
+    virtual void execute(State& state, RectangleShape& shape, Vector2f playerPos, shared_ptr<Player> player, Grid& grid) = 0;
     virtual ~Action() {}
 
     int totalcost = 0;
@@ -55,7 +55,7 @@ class PatrolAction : public Action {
 public:
     PatrolAction() : Action(1) {}// chiffres a equilibrer
     bool canExecute(State& state) override;
-    void execute(State& state,RectangleShape& shape, Vector2f playerPos) override;
+    void execute(State& state,RectangleShape& shape, Vector2f playerPos,	shared_ptr<Player> player, Grid& grid) override;
 
 };
 
@@ -63,7 +63,7 @@ class FollowAction : public Action {
 public:
     FollowAction() : Action(2) {}// chiffres a equilibrer
     bool canExecute(State& state);
-    void execute(State& state, RectangleShape& shape, Vector2f playerPos) override;
+    void execute(State& state, RectangleShape& shape, Vector2f playerPos, shared_ptr<Player> player, Grid& grid) override;
 };
 
 
@@ -72,14 +72,14 @@ public:
     AttackAction() : Action(3) {}// chiffres a equilibrer
     bool canExecute(State& state) override;
 
-    void execute(State& state, RectangleShape& shape, Vector2f playerPos)override;
+    void execute(State& state, RectangleShape& shape, Vector2f playerPos, shared_ptr<Player> player, Grid& grid)override;
 };
 class FleeAction : public Action {
 public:
     FleeAction() : Action(0) {}
     bool canExecute(State& state);
 
-    void execute(State& state, RectangleShape& shape, Vector2f playerPos) override;
+    void execute(State& state, RectangleShape& shape, Vector2f playerPos, shared_ptr<Player> player, Grid& grid) override;
 };
 enum class Goal {
     Patrol,
@@ -99,7 +99,7 @@ private:
 
 public:
 
-    void PerformActions(State& state, RectangleShape& shape, Vector2f playerPos);
+    void PerformActions(State& state, RectangleShape& shape, Vector2f playerPos, shared_ptr<Player> player, Grid& grid);
 
     void PrintState(State& state);
 };
@@ -119,8 +119,10 @@ public:
     GOAPAgent agent;
     Vector2f position;
     vector<Vector2f> waypoints = {};
+
+
 	GOAPEnemy(float  x,float y, float sightRadius, float rangeRadius);
-	void update(float deltaTime, Grid& grid, shared_ptr<Player> );
+	void update(Grid& grid, shared_ptr<Player> );
 	bool isColliding(shared_ptr<Player>);
     bool detectPlayer(shared_ptr<Player> player);
     bool detectRangePlayer(shared_ptr<Player> player);
@@ -130,5 +132,9 @@ public:
     void flee(Vector2f);
     void color(int i);
 };
+bool isPathClear(const Vector2i& start, const Vector2i& end, Grid& grid);
+extern unique_ptr<Pathfinding> pathfinding;
+extern vector<Vector2f> patrolPath;
+extern vector<Vector2i> path;
 
 #endif
