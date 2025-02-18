@@ -152,7 +152,7 @@ void GOAPEnemy::update(float deltaTime, Grid& grid, shared_ptr<Player> player){
 
     agent.PerformActions(state,shape,player->shape.getPosition());
 
-    agent.PrintState(state);
+    /*agent.PrintState(state);*/
 
 }
 
