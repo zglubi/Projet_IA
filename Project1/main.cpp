@@ -23,10 +23,10 @@ int main() {
 
     shared_ptr<Player> player = make_shared<Player>(200, 400);
     vector<shared_ptr<EnemyBT>> enemies = {
-        make_shared<EnemyBT>(100, 100, blackboard, grid, player)/*,
+        make_shared<EnemyBT>(100, 100,100,50, blackboard, grid, player)/*,
         make_shared<EnemyBT>(700, 100, blackboard, grid, player)*/
     };
-    vector<GOAPEnemy> GOAPenemies = { GOAPEnemy(200,100,100), GOAPEnemy(400,200,100) };
+    vector<GOAPEnemy> GOAPenemies = { GOAPEnemy(200,100,100,50), GOAPEnemy(400,200,100,50) };
     grid.loadFromFile("map.txt");
 
     Clock clock;
@@ -52,11 +52,17 @@ int main() {
         window.clear();
         grid.draw(window);
         window.draw(player->shape);
-        for (const auto& enemy : enemies)
+        for (const auto& enemy : enemies) {
             window.draw(enemy->shape);
+            window.draw(enemy->rangeRadiusCircle);
+            window.draw(enemy->sightRadiusCircle);
+        }
         
-        for (const auto& enemy : GOAPenemies)
+        for (const auto& enemy : GOAPenemies) {
             window.draw(enemy.shape);
+            window.draw(enemy.rangeRadiusCircle);
+            window.draw(enemy.sightRadiusCircle);
+        }
 
         window.display();
     }

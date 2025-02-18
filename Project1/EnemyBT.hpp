@@ -21,7 +21,7 @@ private:
 	bool next = false;
 
 public:
-	EnemyBT(float x, float y, Blackboard& bl, Grid& grid, shared_ptr<Player> pl);
+	EnemyBT(float x, float y, float sightRadius, float rangeRadius, Blackboard& bl, Grid& grid, shared_ptr<Player> pl);
 
 	void update(float deltaTime, Grid& grid) override;
 

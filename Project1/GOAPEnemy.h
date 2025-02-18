@@ -106,7 +106,7 @@ public:
 
 class GOAPEnemy : public Enemy {
 private:
-	float detectionRadius;
+	float sightDetectionRadius,rangeDetectionRadius;
 public:
     Clock damageClock, researchPlayer, attackClock;
     bool reversed=false;
@@ -119,11 +119,11 @@ public:
     GOAPAgent agent;
     Vector2f position;
     vector<Vector2f> waypoints = {};
-	GOAPEnemy(float  x,float y,float radius);
+	GOAPEnemy(float  x,float y, float sightRadius, float rangeRadius);
 	void update(float deltaTime, Grid& grid, shared_ptr<Player> );
 	bool isColliding(shared_ptr<Player>);
-    bool detectPlayer(Vector2f playerPos);
-    bool detectRangePlayer(Vector2f playerPos);
+    bool detectPlayer(shared_ptr<Player> player);
+    bool detectRangePlayer(shared_ptr<Player> player);
     void attack();
     void patrol();
     void follow(Vector2f playerPos);
