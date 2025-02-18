@@ -85,8 +85,9 @@ void EnemyBT::patrol(float deltaTime, Grid& grid)
 	
 	if (isPatroling)
 	{
-		
+
 		// Vérifiez si l'ennemi a atteint le point de patrouille actuel
+		if (availablePatrolPath.size() > 0) {
 		if (length(Vector2f(availablePatrolPath[currentPathIndex].x - shape.getPosition().x, availablePatrolPath[currentPathIndex].y - shape.getPosition().y)) < 5.0f) {
 			// Passez au point de patrouille suivant
 			currentPathIndex = (currentPathIndex + 1) % availablePatrolPath.size();
@@ -100,93 +101,95 @@ void EnemyBT::patrol(float deltaTime, Grid& grid)
 		velocity = direction * SPEED;
 		shape.move(velocity * deltaTime);
 	}
+	}
 	else
 	{
-		if (length(Vector2f(availablePatrolPath[currentPathIndex].x - shape.getPosition().x, availablePatrolPath[currentPathIndex].y - shape.getPosition().y)) < 5.0f)
+		if (availablePatrolPath.size() > 0) {
+			if (length(Vector2f(availablePatrolPath[currentPathIndex].x - shape.getPosition().x, availablePatrolPath[currentPathIndex].y - shape.getPosition().y)) < 5.0f)
 		{
 			isPatroling = true;
 		}
-		else
-		{
-
-			if (isPathClear(Vector2i(shape.getGlobalBounds().left / 40, shape.getGlobalBounds().top / 40), Vector2i(availablePatrolPath[currentPathIndex].x / 40, availablePatrolPath[currentPathIndex].y / 40), grid) &&
-				isPathClear(Vector2i((shape.getGlobalBounds().left + shape.getGlobalBounds().width) / 40, shape.getGlobalBounds().top / 40), Vector2i(availablePatrolPath[currentPathIndex].x / 40, availablePatrolPath[currentPathIndex].y / 40), grid) &&
-				isPathClear(Vector2i(shape.getGlobalBounds().left / 40, (shape.getGlobalBounds().top + shape.getGlobalBounds().height) / 40), Vector2i(availablePatrolPath[currentPathIndex].x / 40, availablePatrolPath[currentPathIndex].y / 40), grid) &&
-				isPathClear(Vector2i((shape.getGlobalBounds().left + shape.getGlobalBounds().width) / 40, (shape.getGlobalBounds().top + shape.getGlobalBounds().height) / 40), Vector2i(availablePatrolPath[currentPathIndex].x / 40, availablePatrolPath[currentPathIndex].y / 40), grid))
-			{
-
-				Vector2f direction = Vector2f(availablePatrolPath[currentPathIndex].x - shape.getPosition().x, availablePatrolPath[currentPathIndex].y - shape.getPosition().y);
-				direction = Vector2f(direction.x / length(direction), direction.y / length(direction));
-				velocity = Vector2f(direction.x * SPEED, direction.y * SPEED);
-				shape.move(Vector2f(velocity.x * deltaTime, velocity.y * deltaTime));
-			}
 			else
 			{
-				for (int i = 0; i < GRID_HEIGHT; i++)
+
+				if (isPathClear(Vector2i(shape.getGlobalBounds().left / 40, shape.getGlobalBounds().top / 40), Vector2i(availablePatrolPath[currentPathIndex].x / 40, availablePatrolPath[currentPathIndex].y / 40), grid) &&
+					isPathClear(Vector2i((shape.getGlobalBounds().left + shape.getGlobalBounds().width) / 40, shape.getGlobalBounds().top / 40), Vector2i(availablePatrolPath[currentPathIndex].x / 40, availablePatrolPath[currentPathIndex].y / 40), grid) &&
+					isPathClear(Vector2i(shape.getGlobalBounds().left / 40, (shape.getGlobalBounds().top + shape.getGlobalBounds().height) / 40), Vector2i(availablePatrolPath[currentPathIndex].x / 40, availablePatrolPath[currentPathIndex].y / 40), grid) &&
+					isPathClear(Vector2i((shape.getGlobalBounds().left + shape.getGlobalBounds().width) / 40, (shape.getGlobalBounds().top + shape.getGlobalBounds().height) / 40), Vector2i(availablePatrolPath[currentPathIndex].x / 40, availablePatrolPath[currentPathIndex].y / 40), grid))
 				{
-					for (int j = 0; j < GRID_WIDTH; j++)
+
+					Vector2f direction = Vector2f(availablePatrolPath[currentPathIndex].x - shape.getPosition().x, availablePatrolPath[currentPathIndex].y - shape.getPosition().y);
+					direction = Vector2f(direction.x / length(direction), direction.y / length(direction));
+					velocity = Vector2f(direction.x * SPEED, direction.y * SPEED);
+					shape.move(Vector2f(velocity.x * deltaTime, velocity.y * deltaTime));
+				}
+				else
+				{
+					for (int i = 0; i < GRID_HEIGHT; i++)
 					{
-						if (grid.getCell(j, i).walkable == false)
+						for (int j = 0; j < GRID_WIDTH; j++)
 						{
-							grid.getCell(j, i).shape.setFillColor(sf::Color::White);
+							if (grid.getCell(j, i).walkable == false)
+							{
+								grid.getCell(j, i).shape.setFillColor(sf::Color::White);
+							}
+							else
+							{
+								grid.getCell(j, i).shape.setFillColor(sf::Color::Black);
+							}
+						}
+					}
+
+					for (auto cell : path)
+					{
+						grid.getCell(cell.x, cell.y).shape.setFillColor(sf::Color::Green);
+					}
+
+
+					if (position != Vector2i(shape.getPosition().x / 40, shape.getPosition().y / 40))
+					{
+						position = Vector2i(shape.getPosition().x / 40, shape.getPosition().y / 40);
+
+						next = false;
+					}
+
+					if (static_cast<int>(shape.getPosition().x) % 40 < 25 && static_cast<int>(shape.getPosition().x) % 40 > 15 && static_cast<int>(shape.getPosition().y) % 40 < 25 && static_cast<int>(shape.getPosition().y) % 40 > 15 && !next)
+					{
+						next = true;
+						position = Vector2i(shape.getPosition().x / 40, shape.getPosition().y / 40);
+					}
+
+					if ((static_cast<int>(shape.getPosition().x) % 40 >= 25 || static_cast<int>(shape.getPosition().x) % 40 <= 15 || static_cast<int>(shape.getPosition().y) % 40 >= 25 || static_cast<int>(shape.getPosition().y) % 40 <= 15) && !next)
+					{
+						Vector2f direction = Vector2f(position.x * 40 + 20, position.y * 40 + 20) - shape.getPosition();
+						direction = Vector2f(direction.x / length(direction), direction.y / length(direction));
+						velocity = Vector2f(direction.x * SPEED, direction.y * SPEED);
+						shape.move(Vector2f(velocity.x * deltaTime, velocity.y * deltaTime));
+					}
+					else if (next)
+					{
+						patrolBackPath = pathfinding->findPath(grid, Vector2i(shape.getPosition().x / 40, shape.getPosition().y / 40), Vector2i(availablePatrolPath[currentPathIndex].x / 40, availablePatrolPath[currentPathIndex].y / 40));
+
+						Vector2f direction;
+						if (patrolBackPath.size() > 1)
+						{
+							direction = Vector2f(patrolBackPath[1].x - position.x, patrolBackPath[1].y - position.y);
+						}
+						else if (patrolBackPath.size() == 1)
+						{
+							direction = Vector2f(patrolBackPath[0].x - position.x, patrolBackPath[0].y - position.y);
 						}
 						else
 						{
-							grid.getCell(j, i).shape.setFillColor(sf::Color::Black);
+							direction = Vector2f(availablePatrolPath[currentPathIndex].x - position.x, availablePatrolPath[currentPathIndex].y - position.y);
 						}
+
+						direction = Vector2f(direction.x / length(direction), direction.y / length(direction));
+						velocity = Vector2f(direction.x * SPEED, direction.y * SPEED);
+						shape.move(Vector2f(velocity.x * deltaTime, velocity.y * deltaTime));
 					}
-				}
-
-				for (auto cell : path)
-				{
-					grid.getCell(cell.x, cell.y).shape.setFillColor(sf::Color::Green);
-				}
-
-
-				if (position != Vector2i(shape.getPosition().x / 40, shape.getPosition().y / 40))
-				{
-					position = Vector2i(shape.getPosition().x / 40, shape.getPosition().y / 40);
-
-					next = false;
-				}
-
-				if (static_cast<int>(shape.getPosition().x) % 40 < 25 && static_cast<int>(shape.getPosition().x) % 40 > 15 && static_cast<int>(shape.getPosition().y) % 40 < 25 && static_cast<int>(shape.getPosition().y) % 40 > 15 && !next)
-				{
-					next = true;
-					position = Vector2i(shape.getPosition().x / 40, shape.getPosition().y / 40);
-				}
-
-				if ((static_cast<int>(shape.getPosition().x) % 40 >= 25 || static_cast<int>(shape.getPosition().x) % 40 <= 15 || static_cast<int>(shape.getPosition().y) % 40 >= 25 || static_cast<int>(shape.getPosition().y) % 40 <= 15) && !next)
-				{
-					Vector2f direction = Vector2f(position.x * 40 + 20, position.y * 40 + 20) - shape.getPosition();
-					direction = Vector2f(direction.x / length(direction), direction.y / length(direction));
-					velocity = Vector2f(direction.x * SPEED, direction.y * SPEED);
-					shape.move(Vector2f(velocity.x * deltaTime, velocity.y * deltaTime));
-				}
-				else if (next)
-				{
-					patrolBackPath = pathfinding->findPath(grid, Vector2i(shape.getPosition().x / 40, shape.getPosition().y / 40), Vector2i(availablePatrolPath[currentPathIndex].x / 40, availablePatrolPath[currentPathIndex].y / 40));
-
-					Vector2f direction;
-					if (patrolBackPath.size() > 1)
-					{
-						direction = Vector2f(patrolBackPath[1].x - position.x, patrolBackPath[1].y - position.y);
-					}
-					else if (patrolBackPath.size() == 1)
-					{
-						direction = Vector2f(patrolBackPath[0].x - position.x, patrolBackPath[0].y - position.y);
-					}
-					else
-					{
-						direction = Vector2f(availablePatrolPath[currentPathIndex].x - position.x, availablePatrolPath[currentPathIndex].y - position.y);
-					}
-
-					direction = Vector2f(direction.x / length(direction), direction.y / length(direction));
-					velocity = Vector2f(direction.x * SPEED, direction.y * SPEED);
-					shape.move(Vector2f(velocity.x * deltaTime, velocity.y * deltaTime));
 				}
 			}
-
 		}
 	}
 }
