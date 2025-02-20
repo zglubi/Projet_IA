@@ -240,59 +240,9 @@ void EnemyBT::flee(float deltaTime, Grid& grid)
 {
 	Vector2f direction = Vector2f(shape.getPosition().x - player->shape.getPosition().x, shape.getPosition().y - player->shape.getPosition().y);
 	direction = Vector2f(direction.x / length(direction), direction.y / length(direction));
-	velocity = Vector2f(direction.x * SPEED, direction.y * SPEED);
+	velocity = direction * SPEED * deltaTime;
 	
-	Vector2f newPosition = Vector2f(shape.getGlobalBounds().left, shape.getGlobalBounds().top) + velocity * deltaTime;
-	FloatRect newBounds(newPosition, shape.getSize());
-	
-	auto isWalkable = [&](float x, float y) {
-		int gridX = static_cast<int>(x / CELL_SIZE);
-		int gridY = static_cast<int>(y / CELL_SIZE);
-		return gridX >= 0 && gridX < GRID_WIDTH && gridY >= 0 && gridY < GRID_HEIGHT && grid.getCell(gridX, gridY).walkable;
-		};
-
-
-	if (velocity.x > 0)
-	{
-		if (isWalkable(newBounds.left + newBounds.width + 2, shape.getGlobalBounds().top) &&
-			isWalkable(newBounds.left + newBounds.width + 2, shape.getGlobalBounds().top + shape.getGlobalBounds().height - 1))
-		{
-			shape.move(Vector2f(velocity.x * deltaTime, 0));		
-		}
-	}
-	else
-	{
-		if (isWalkable(newBounds.left - 2, shape.getGlobalBounds().top) &&
-			isWalkable(newBounds.left - 2, shape.getGlobalBounds().top + shape.getGlobalBounds().height - 1))
-		{
-			shape.move(Vector2f(velocity.x * deltaTime, 0));
-		}
-	}
-
-	if (velocity.y > 0)
-	{
-		if (isWalkable(shape.getGlobalBounds().left, newBounds.top + newBounds.height + 2) &&
-			isWalkable(shape.getGlobalBounds().left + shape.getGlobalBounds().width, newBounds.top + newBounds.height + 2))
-		{
-			shape.move(Vector2f(0, velocity.y * deltaTime));	
-		}
-	}
-	else
-	{
-		if (isWalkable(shape.getGlobalBounds().left, newBounds.top - 2) &&
-			isWalkable(shape.getGlobalBounds().left + shape.getGlobalBounds().width - 1, newBounds.top - 2))
-		{
-			shape.move(Vector2f(0, velocity.y * deltaTime));
-		}
-	}
-
-
-	/*if (isWalkable(newBounds.left, newBounds.top) &&
-		isWalkable(newBounds.left + newBounds.width - 1, newBounds.top) &&
-		isWalkable(newBounds.left, newBounds.top + newBounds.height - 1) &&
-		isWalkable(newBounds.left + newBounds.width - 1, newBounds.top + newBounds.height - 1)) {
-		shape.move(Vector2f(velocity.x * deltaTime, velocity.y * deltaTime));
-	}*/
+	enemyMove(velocity, grid);
 }
 
 bool EnemyBT::isPathClear(const Vector2i& start, const Vector2i& end, Grid& grid) {
@@ -312,7 +262,7 @@ bool EnemyBT::isPathClear(const Vector2i& start, const Vector2i& end, Grid& grid
 		// Vérifiez si la cellule est un mur
 		if (x1 >= 0 && x1 < GRID_WIDTH && y1 >= 0 && y1 < GRID_HEIGHT) {
 
-			if (!grid.getCell(x1, y1).walkable) {
+			if (!grid.getCell(x1, y1).Ewalkable) {
 				return false;
 			}
 		}
@@ -339,5 +289,54 @@ bool EnemyBT::isPathClear(const Vector2i& start, const Vector2i& end, Grid& grid
 
 void EnemyBT::enemyMove(Vector2f direction, Grid& grid)
 {
+	auto isWalkable = [&](float x, float y) {
+		int gridX = static_cast<int>(x / CELL_SIZE);
+		int gridY = static_cast<int>(y / CELL_SIZE);
+		return gridX >= 0 && gridX < GRID_WIDTH && gridY >= 0 && gridY < GRID_HEIGHT && grid.getCell(gridX, gridY).Ewalkable;
+		};
 
+	Vector2f newPosition = Vector2f(shape.getGlobalBounds().left, shape.getGlobalBounds().top) + direction;
+	FloatRect newBounds(newPosition, shape.getSize());
+
+	if (direction.x > 0)
+	{
+		if (isWalkable(newBounds.left + newBounds.width + 2, shape.getGlobalBounds().top) &&
+			isWalkable(newBounds.left + newBounds.width + 2, shape.getGlobalBounds().top + shape.getGlobalBounds().height - 1))
+		{
+			shape.move(Vector2f(direction.x, 0));
+		}
+		else
+		{
+			cout << "obstacle" << endl;
+		}
+	}
+	else
+	{
+		if (isWalkable(newBounds.left - 2, shape.getGlobalBounds().top) &&
+			isWalkable(newBounds.left - 2, shape.getGlobalBounds().top + shape.getGlobalBounds().height - 1))
+		{
+			shape.move(Vector2f(direction.x, 0));
+		}
+		else
+		{
+			cout << "obstacle" << endl;
+		}
+	}
+
+	if (direction.y > 0)
+	{
+		if (isWalkable(shape.getGlobalBounds().left, newBounds.top + newBounds.height + 2) &&
+			isWalkable(shape.getGlobalBounds().left + shape.getGlobalBounds().width, newBounds.top + newBounds.height + 2))
+		{
+			shape.move(Vector2f(0, direction.y));
+		}
+	}
+	else
+	{
+		if (isWalkable(shape.getGlobalBounds().left, newBounds.top - 2) &&
+			isWalkable(shape.getGlobalBounds().left + shape.getGlobalBounds().width - 1, newBounds.top - 2))
+		{
+			shape.move(Vector2f(0, direction.y));
+		}
+	}
 }
