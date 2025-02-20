@@ -22,13 +22,6 @@ void Action::settotalCost(int i) { totalcost = i; }
 void Action::increasetotalCost(int i) { totalcost += i; }
 void Action::decreasetotalCost(int i) { totalcost -= i; }
 
-bool PatrolAction::canExecute(State& state) {
-    return !state.getplayerInRange();
-}
-void PatrolAction::execute(State& state, RectangleShape& shape, Vector2f playerPos, shared_ptr<Player> player,Grid& grid) {
-    cout << "L'agent patrouille.\n";
-    //patrol();
-}
 
 bool FollowAction::canExecute(State& state) {
     return state.getplayerInSight();
@@ -171,11 +164,6 @@ vector<Action*> GOAPPlanner::Plan(State& state, Goal goal)
     if (state.getHp() > 10) {
         goal = Goal::Flee;
     }
-    if (goal == Goal::Patrol) {
-        if (!state.getplayerInSight() and !state.getplayerInRange()) {
-            plan.push_back(new PatrolAction());
-        }
-    }
     if (goal == Goal::Follow) {
         if (state.getplayerInSight() and !state.getplayerInRange())
             plan.push_back(new FollowAction());
@@ -247,21 +235,15 @@ bool GOAPEnemy::isColliding(shared_ptr<Player> player) {
 void GOAPAgent::PerformActions(State& state,RectangleShape& shape, Vector2f playerPos, shared_ptr<Player> player, Grid& grid) {
     
     int totalCost1 = 0, totalCost2 = 0, totalCost3 = 0;
-    Goal goal1 = Goal::Patrol;
-    Goal goal2 = Goal::Follow;
-    Goal goal3 = Goal::Attack;
+    
+    Goal goal1 = Goal::Follow;
+    Goal goal2 = Goal::Attack;
 
     vector<Action*> plan1 = planner.Plan(state, goal1);
     vector<Action*> plan2 = planner.Plan(state, goal2);
-    vector<Action*> plan3 = planner.Plan(state, goal3);
+    
 
     for (auto action : plan1) {
-        totalCost1 += action->gettotalCost();
-        if (state.getlowHealth()) {
-            totalCost1 += 1; // moins enclin à patrol si bas en vie, mais prefere patrol que follow si bas en vie
-        }
-    }
-    for (auto action : plan2) {
         totalCost2 += action->gettotalCost();
         if (state.getlowHealth()) {
             totalCost1 += 2;// moins enclin a follow si bas en vie
@@ -273,7 +255,7 @@ void GOAPAgent::PerformActions(State& state,RectangleShape& shape, Vector2f play
             totalCost2 -= 5; // envie (frénétique) de follow à vue
         }
     }
-    for (auto action : plan3) {
+    for (auto action : plan2) {
         totalCost2 += action->gettotalCost();
         if (state.getlowHealth()) {
             totalCost1 += 2; // moins enclin à attaquer si bas en vie
@@ -296,17 +278,6 @@ void GOAPAgent::PerformActions(State& state,RectangleShape& shape, Vector2f play
     //}
     if (totalCost2 < totalCost1 and totalCost2 < totalCost3) {
         for (auto action : plan2) {
-            if (action->canExecute(state)) {
-                action->execute(state, shape, playerPos,player,grid);  // Exécute l'action
-            }
-            else {
-                cout << "Action impossible : " << typeid(*action).name() << "\n";
-            }
-            delete action;  // Libérer la mémoire
-        }
-    }
-    else if (totalCost3 < totalCost1 and totalCost3 < totalCost2) {
-        for (auto action : plan3) {
             if (action->canExecute(state)) {
                 action->execute(state, shape, playerPos,player,grid);  // Exécute l'action
             }

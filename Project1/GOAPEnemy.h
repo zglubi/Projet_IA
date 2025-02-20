@@ -51,13 +51,6 @@ public:
 
 };
 
-class PatrolAction : public Action {
-public:
-    PatrolAction() : Action(1) {}// chiffres a equilibrer
-    bool canExecute(State& state) override;
-    void execute(State& state,RectangleShape& shape, Vector2f playerPos,	shared_ptr<Player> player, Grid& grid) override;
-
-};
 
 class FollowAction : public Action {
 public:
@@ -82,7 +75,7 @@ public:
     void execute(State& state, RectangleShape& shape, Vector2f playerPos, shared_ptr<Player> player, Grid& grid) override;
 };
 enum class Goal {
-    Patrol,
+    
     Follow,
     Attack,
     Flee
@@ -111,10 +104,7 @@ public:
     Clock damageClock, researchPlayer, attackClock;
     bool reversed=false;
 	State state;
-    AttackAction attackaction;
-    FleeAction fleeaction;
-    FollowAction followaction;
-    PatrolAction patrolaction;
+    
     GOAPPlanner planner;
     GOAPAgent agent;
     Vector2f position;
