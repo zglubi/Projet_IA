@@ -142,6 +142,7 @@ void FleeAction::execute(State& state, RectangleShape& shape, Vector2f playerPos
     }
 
 
+
     /*if (isWalkable(newBounds.left, newBounds.top) &&
         isWalkable(newBounds.left + newBounds.width - 1, newBounds.top) &&
         isWalkable(newBounds.left, newBounds.top + newBounds.height - 1) &&
@@ -149,7 +150,7 @@ void FleeAction::execute(State& state, RectangleShape& shape, Vector2f playerPos
         shape.move(Vector2f(velocity.x * 0.016, velocity.y * 0.016));
     }*/
     if (attackCD.getElapsedTime().asSeconds() > 5) {
-        state.decreaseHp(3);// chiffres a equilibrer
+        state.decreaseHp(5); // chiffres a equilibrer
         attackCD.restart();
     }
     state.setlowHealth(false);
