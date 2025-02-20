@@ -19,7 +19,7 @@ EnemyBT::EnemyBT(float x, float y, float sightRadius, float rangeRadius, Blackbo
 	chaseSelect->AddChild(move(chaseSequence));
 	chaseSelect->AddChild(move(fleeAction));
 
-	auto vueCondition = make_unique<ConditionNode>(blackboard, "vue", 250);
+	auto vueCondition = make_unique<ConditionNode>(blackboard, "vue", 150);
 	auto vueSequence = make_unique<SequenceNode>();
 	vueSequence->AddChild(move(vueCondition));
 	vueSequence->AddChild(move(chaseSelect));
@@ -32,11 +32,11 @@ EnemyBT::EnemyBT(float x, float y, float sightRadius, float rangeRadius, Blackbo
 	player = pl;
 
 
-	patrolPath.push_back(Vector2f(400, 400));
-	patrolPath.push_back(Vector2f(500, 400));
-	patrolPath.push_back(Vector2f(500, 500));
-	patrolPath.push_back(Vector2f(400, 500));
-	patrolPath.push_back(Vector2f(400, 400));
+	patrolPath.push_back(Vector2f(540, 540));
+	patrolPath.push_back(Vector2f(680, 540));
+	patrolPath.push_back(Vector2f(680, 700));
+	patrolPath.push_back(Vector2f(540, 700));
+	patrolPath.push_back(Vector2f(540, 540));
 }
 
 void EnemyBT::update(float deltaTime, Grid& grid) 
