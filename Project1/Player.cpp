@@ -24,16 +24,16 @@ void Player::update(float deltaTime, Grid& grid) {
 
     if (movement.x > 0)
     {
-        if (isWalkable(newBounds.left + newBounds.width - 1, shape.getGlobalBounds().top) &&
-            isWalkable(newBounds.left + newBounds.width - 1, shape.getGlobalBounds().top + shape.getGlobalBounds().height))
+        if (isWalkable(newBounds.left + newBounds.width + 2, shape.getGlobalBounds().top) &&
+            isWalkable(newBounds.left + newBounds.width + 2, shape.getGlobalBounds().top + shape.getGlobalBounds().height))
         {
             shape.move(movement.x, 0);
         }
     }
     else
     {
-        if (isWalkable(newBounds.left, shape.getGlobalBounds().top) &&
-            isWalkable(newBounds.left, shape.getGlobalBounds().top + shape.getGlobalBounds().height))
+        if (isWalkable(newBounds.left - 2, shape.getGlobalBounds().top) &&
+            isWalkable(newBounds.left - 2, shape.getGlobalBounds().top + shape.getGlobalBounds().height))
         {
             shape.move(movement.x, 0);
         }
@@ -41,16 +41,16 @@ void Player::update(float deltaTime, Grid& grid) {
 
     if (movement.y > 0)
     {
-        if (isWalkable(shape.getGlobalBounds().left, newBounds.top + newBounds.height - 1) &&
-            isWalkable(shape.getGlobalBounds().left + shape.getGlobalBounds().width - 1, newBounds.top + newBounds.height - 1))
+        if (isWalkable(shape.getGlobalBounds().left, newBounds.top + newBounds.height + 2) &&
+            isWalkable(shape.getGlobalBounds().left + shape.getGlobalBounds().width - 1, newBounds.top + newBounds.height + 2))
         {
             shape.move(0, movement.y);
         }
     }
     else
     {
-        if (isWalkable(shape.getGlobalBounds().left, newBounds.top) &&
-            isWalkable(shape.getGlobalBounds().left + shape.getGlobalBounds().width - 1, newBounds.top))
+        if (isWalkable(shape.getGlobalBounds().left, newBounds.top - 2) &&
+            isWalkable(shape.getGlobalBounds().left + shape.getGlobalBounds().width, newBounds.top - 2))
         {
             shape.move(0, movement.y);
         }

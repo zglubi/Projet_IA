@@ -4,6 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include "Grid.hpp"
 #include "Useful.hpp"
+#include <iostream>
 using namespace std;
 using namespace sf;
 
