@@ -234,7 +234,7 @@ bool GOAPEnemy::isColliding(shared_ptr<Player> player) {
 
 void GOAPAgent::PerformActions(State& state,RectangleShape& shape, Vector2f playerPos, shared_ptr<Player> player, Grid& grid) {
     
-    int totalCost1 = 0, totalCost2 = 0, totalCost3 = 0;
+    int totalCost1 = 0, totalCost2 = 0;
     
     Goal goal1 = Goal::Follow;
     Goal goal2 = Goal::Attack;
@@ -244,41 +244,44 @@ void GOAPAgent::PerformActions(State& state,RectangleShape& shape, Vector2f play
     
 
     for (auto action : plan1) {
-        totalCost2 += action->gettotalCost();
+        totalCost1 += action->gettotalCost();
         if (state.getlowHealth()) {
             totalCost1 += 2;// moins enclin a follow si bas en vie
         }
         if (state.getplayerInRange()) {
-            totalCost2 += 2; // si peut attaquer, préfère attaquer mais ne plus follow
+            totalCost1 += 2; // si peut attaquer, préfère attaquer mais ne plus follow
         }
         if (state.getplayerInSight()) {
-            totalCost2 -= 5; // envie (frénétique) de follow à vue
+            totalCost1 -= 5; // envie (frénétique) de follow à vue
         }
     }
     for (auto action : plan2) {
         totalCost2 += action->gettotalCost();
         if (state.getlowHealth()) {
-            totalCost1 += 2; // moins enclin à attaquer si bas en vie
+            totalCost2 += 2; // moins enclin à attaquer si bas en vie
         }
         else if (!state.getlowHealth() and state.getplayerInRange()) {
-            totalCost3 -= 50; // si pas bas en vie et an range, volonté, d'attaquer, à 100%
+            totalCost2 -= 50; // si pas bas en vie et an range, volonté, d'attaquer, à 100%
         }
     }
-    //if (totalCost1 < totalCost2 and totalCost1 < totalCost3) {
+    if (totalCost1 < totalCost2) {
 
-    //for (auto action : plan1) {
-    //    if (action->canExecute(state)) {
-    //        action->execute(state,shape,playerPos,player);  // Exécute l'action
-    //    }
-    //    else {
-    //        cout << "Action impossible : " << typeid(*action).name() << "\n";
-    //    }
-    //    delete action;  // Libérer la mémoire
-    //}
-    //}
-    if (totalCost2 < totalCost1 and totalCost2 < totalCost3) {
+        for (auto action : plan1) {
+            if (action->canExecute(state)) {
+                cout << "follow";
+
+                action->execute(state, shape, playerPos, player, grid);  // Exécute l'action
+            }
+            else {
+                cout << "Action impossible : " << typeid(*action).name() << "\n";
+            }
+            delete action;  // Libérer la mémoire
+        }
+    }
+    if (totalCost2 < totalCost1) {
         for (auto action : plan2) {
             if (action->canExecute(state)) {
+                cout << "atk";
                 action->execute(state, shape, playerPos,player,grid);  // Exécute l'action
             }
             else {
@@ -287,6 +290,8 @@ void GOAPAgent::PerformActions(State& state,RectangleShape& shape, Vector2f play
             delete action;  // Libérer la mémoire
         }
     }
+	cout << "Total cost 1: " << totalCost1 << "\n";
+	cout << "Total cost 2: " << totalCost2 << "\n";
 }
 
 bool GOAPEnemy::detectPlayer(shared_ptr<Player> player) {
