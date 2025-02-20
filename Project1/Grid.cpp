@@ -3,7 +3,7 @@
 #include <iostream>
 
 Grid::Grid() {
-    cells.resize(GRID_HEIGHT, std::vector<Cell>(GRID_WIDTH, { true, {0, 0}, sf::RectangleShape(sf::Vector2f(CELL_SIZE, CELL_SIZE)) }));
+    cells.resize(GRID_HEIGHT, std::vector<Cell>(GRID_WIDTH, { true,true, { 0, 0 }, sf::RectangleShape(sf::Vector2f(CELL_SIZE, CELL_SIZE)) }));
     for (int y = 0; y < GRID_HEIGHT; ++y) {
         for (int x = 0; x < GRID_WIDTH; ++x) {
             cells[y][x].position = sf::Vector2f(x * CELL_SIZE, y * CELL_SIZE);
@@ -27,7 +27,8 @@ void Grid::loadFromFile(const std::string& filename) {
         std::string line;
         if (!std::getline(file, line)) break;
         for (int x = 0; x < GRID_WIDTH && x < line.size(); ++x) {
-            cells[y][x].walkable = (line[x] == '0');
+            cells[y][x].walkable = (line[x] == '0' or line[x]=='2');
+            cells[y][x].Ewalkable = (line[x] != '2');
             if (!cells[y][x].walkable) {
                 cells[y][x].shape.setFillColor(sf::Color::White);
             }
