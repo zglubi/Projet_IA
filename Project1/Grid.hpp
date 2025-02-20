@@ -12,7 +12,7 @@ const int GRID_HEIGHT = 20;
 const int CELL_SIZE = 40;
 
 struct Cell {
-    bool walkable;
+    bool walkable,Ewalkable;
     sf::Vector2f position;
     sf::RectangleShape shape;
 };

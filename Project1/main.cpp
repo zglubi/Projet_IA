@@ -14,6 +14,10 @@ using namespace std;
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 800;
 
+int resizeCoord(int coord) {
+	return coord * 40;
+}
+
 int main() {
     RenderWindow window(VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Jeu SFML - IA Ennemis");
     window.setFramerateLimit(60);
