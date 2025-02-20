@@ -8,7 +8,7 @@ using namespace std;
 using namespace sf;
 
 const int GRID_WIDTH = 20;
-const int GRID_HEIGHT = 15;
+const int GRID_HEIGHT = 20;
 const int CELL_SIZE = 40;
 
 struct Cell {
