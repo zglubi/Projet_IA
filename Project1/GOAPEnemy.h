@@ -41,20 +41,19 @@ public:
     virtual ~Action() {}
 
     int totalcost = 0;
+    Vector2i position;
     
     int getcost();
     int gettotalCost();
     void settotalCost(int i);
     void increasetotalCost(int i);
     void decreasetotalCost(int i);
-
-
 };
 
 
 class FollowAction : public Action {
 public:
-    FollowAction() : Action(2) {}// chiffres a equilibrer
+    FollowAction(Vector2i pos);// chiffres a equilibrer
     bool canExecute(State& state);
     void execute(State& state, RectangleShape& shape, Vector2f playerPos, shared_ptr<Player> player, Grid& grid) override;
 };
@@ -82,7 +81,7 @@ enum class Goal {
 };
 class GOAPPlanner {
 public:
-    std::vector<Action*> Plan(State& state, Goal goal);
+    std::vector<Action*> Plan(State& state, Goal goal, Vector2i position);
 };
 
 class GOAPAgent {
@@ -91,7 +90,7 @@ private:
     GOAPPlanner planner;
 
 public:
-
+    Vector2i position;
     void PerformActions(State& state, RectangleShape& shape, Vector2f playerPos, shared_ptr<Player> player, Grid& grid);
 
     void PrintState(State& state);
