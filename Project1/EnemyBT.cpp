@@ -195,7 +195,8 @@ void EnemyBT::chase(float deltaTime, Grid& grid)
 		path = pathfinding->findPath(grid, Vector2i(shape.getPosition().x / 40, shape.getPosition().y / 40), Vector2i(player->shape.getPosition().x / 40, player->shape.getPosition().y / 40));
 		if (path.size() == 0)
 		{
-			action = 1;
+			isPatroling = true;
+			patrol(deltaTime, grid);
 			return;
 		}
 		if (position != Vector2i(shape.getPosition().x / 40, shape.getPosition().y / 40))
