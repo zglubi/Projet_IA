@@ -1,7 +1,8 @@
 #include "EnemyBT.hpp"
 
 
-EnemyBT::EnemyBT(float x, float y, float sightRadius, float rangeRadius, Blackboard& bl, Grid& grid, shared_ptr<Player> pl) : Enemy(x, y,sightRadius,rangeRadius), blackboard(bl)
+EnemyBT::EnemyBT(float x, float y, float sightRadius, float rangeRadius, Blackboard& bl, Grid& grid, shared_ptr<Player> pl, vector<Vector2f> pPath) : 
+	Enemy(x, y,sightRadius,rangeRadius), blackboard(bl), patrolPath(pPath)
 {
 	root = make_unique<SelectorNode>();
 	auto patrolAction = make_unique<ActionNode>(1);
@@ -31,13 +32,6 @@ EnemyBT::EnemyBT(float x, float y, float sightRadius, float rangeRadius, Blackbo
 	hp = 100.0f;
 	player = pl;
 	action = 0;
-
-
-	patrolPath.push_back(Vector2f(540, 540));
-	patrolPath.push_back(Vector2f(680, 540));
-	patrolPath.push_back(Vector2f(680, 700));
-	patrolPath.push_back(Vector2f(540, 700));
-	patrolPath.push_back(Vector2f(540, 540));
 }
 
 void EnemyBT::update(float deltaTime, Grid& grid) 
@@ -179,12 +173,27 @@ void EnemyBT::patrol(float deltaTime, Grid& grid)
 
 void EnemyBT::chase(float deltaTime, Grid& grid)
 {
+	auto isWalkable = [&](float x, float y) {
+		int gridX = static_cast<int>(x / CELL_SIZE);
+		int gridY = static_cast<int>(y / CELL_SIZE);
+		return gridX >= 0 && gridX < GRID_WIDTH && gridY >= 0 && gridY < GRID_HEIGHT && grid.getCell(gridX, gridY).Ewalkable;
+		};
+	
 	if (isPathClear(Vector2i(shape.getGlobalBounds().left / 40, shape.getGlobalBounds().top / 40), Vector2i(player->shape.getGlobalBounds().left / 40, player->shape.getGlobalBounds().top / 40), grid) &&
 		isPathClear(Vector2i((shape.getGlobalBounds().left + shape.getGlobalBounds().width) / 40, shape.getGlobalBounds().top / 40), Vector2i((player->shape.getGlobalBounds().left + player->shape.getGlobalBounds().width) / 40, player->shape.getGlobalBounds().top / 40), grid) &&
 		isPathClear(Vector2i(shape.getGlobalBounds().left / 40, (shape.getGlobalBounds().top + shape.getGlobalBounds().height) / 40), Vector2i(player->shape.getGlobalBounds().left / 40, (player->shape.getGlobalBounds().top + player->shape.getGlobalBounds().height) / 40), grid) &&
 		isPathClear(Vector2i((shape.getGlobalBounds().left + shape.getGlobalBounds().width) / 40, (shape.getGlobalBounds().top + shape.getGlobalBounds().height) / 40), Vector2i((player->shape.getGlobalBounds().left + player->shape.getGlobalBounds().width) / 40, (player->shape.getGlobalBounds().top + player->shape.getGlobalBounds().height) / 40), grid))
 	{
-		
+		if (
+			!isWalkable(player->shape.getGlobalBounds().left, player->shape.getGlobalBounds().top) ||
+			!isWalkable(player->shape.getGlobalBounds().left + player->shape.getGlobalBounds().width, player->shape.getGlobalBounds().top) ||
+			!isWalkable(player->shape.getGlobalBounds().left, player->shape.getGlobalBounds().top + player->shape.getGlobalBounds().height) ||
+			!isWalkable(player->shape.getGlobalBounds().left + player->shape.getGlobalBounds().width, player->shape.getGlobalBounds().top + player->shape.getGlobalBounds().height))
+		{
+			isPatroling = true;
+			patrol(deltaTime, grid);
+			return;
+		}
 		Vector2f direction = Vector2f(player->shape.getPosition().x - shape.getPosition().x, player->shape.getPosition().y - shape.getPosition().y);
 		direction = Vector2f(direction.x / length(direction), direction.y / length(direction));
 		velocity = Vector2f(direction.x * SPEED, direction.y * SPEED);
@@ -192,8 +201,13 @@ void EnemyBT::chase(float deltaTime, Grid& grid)
 	}
 	else
 	{
+		
 		path = pathfinding->findPath(grid, Vector2i(shape.getPosition().x / 40, shape.getPosition().y / 40), Vector2i(player->shape.getPosition().x / 40, player->shape.getPosition().y / 40));
-		if (path.size() == 0)
+		if (path.size() == 0 || (
+			!isWalkable(player->shape.getGlobalBounds().left, player->shape.getGlobalBounds().top) || 
+			!isWalkable(player->shape.getGlobalBounds().left + player->shape.getGlobalBounds().width, player->shape.getGlobalBounds().top) ||
+			!isWalkable(player->shape.getGlobalBounds().left, player->shape.getGlobalBounds().top + player->shape.getGlobalBounds().height) ||
+			!isWalkable(player->shape.getGlobalBounds().left + player->shape.getGlobalBounds().width, player->shape.getGlobalBounds().top + player->shape.getGlobalBounds().height)))
 		{
 			isPatroling = true;
 			patrol(deltaTime, grid);
