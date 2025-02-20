@@ -185,9 +185,9 @@ void EnemyBT::chase(float deltaTime, Grid& grid)
 		isPathClear(Vector2i((shape.getGlobalBounds().left + shape.getGlobalBounds().width) / 40, (shape.getGlobalBounds().top + shape.getGlobalBounds().height) / 40), Vector2i((player->shape.getGlobalBounds().left + player->shape.getGlobalBounds().width) / 40, (player->shape.getGlobalBounds().top + player->shape.getGlobalBounds().height) / 40), grid))
 	{
 		if (
-			!isWalkable(player->shape.getGlobalBounds().left, player->shape.getGlobalBounds().top) ||
-			!isWalkable(player->shape.getGlobalBounds().left + player->shape.getGlobalBounds().width, player->shape.getGlobalBounds().top) ||
-			!isWalkable(player->shape.getGlobalBounds().left, player->shape.getGlobalBounds().top + player->shape.getGlobalBounds().height) ||
+			!isWalkable(player->shape.getGlobalBounds().left, player->shape.getGlobalBounds().top) &&
+			!isWalkable(player->shape.getGlobalBounds().left + player->shape.getGlobalBounds().width, player->shape.getGlobalBounds().top) &&
+			!isWalkable(player->shape.getGlobalBounds().left, player->shape.getGlobalBounds().top + player->shape.getGlobalBounds().height) &&
 			!isWalkable(player->shape.getGlobalBounds().left + player->shape.getGlobalBounds().width, player->shape.getGlobalBounds().top + player->shape.getGlobalBounds().height))
 		{
 			isPatroling = true;
