@@ -254,16 +254,16 @@ void EnemyBT::flee(float deltaTime, Grid& grid)
 
 	if (velocity.x > 0)
 	{
-		if (isWalkable(newBounds.left + newBounds.width - 1, shape.getGlobalBounds().top) &&
-			isWalkable(newBounds.left + newBounds.width - 1, shape.getGlobalBounds().top + shape.getGlobalBounds().height - 1))
+		if (isWalkable(newBounds.left + newBounds.width + 2, shape.getGlobalBounds().top) &&
+			isWalkable(newBounds.left + newBounds.width + 2, shape.getGlobalBounds().top + shape.getGlobalBounds().height - 1))
 		{
 			shape.move(Vector2f(velocity.x * deltaTime, 0));		
 		}
 	}
 	else
 	{
-		if (isWalkable(newBounds.left, shape.getGlobalBounds().top) &&
-			isWalkable(newBounds.left, shape.getGlobalBounds().top + shape.getGlobalBounds().height - 1))
+		if (isWalkable(newBounds.left - 2, shape.getGlobalBounds().top) &&
+			isWalkable(newBounds.left - 2, shape.getGlobalBounds().top + shape.getGlobalBounds().height - 1))
 		{
 			shape.move(Vector2f(velocity.x * deltaTime, 0));
 		}
@@ -271,16 +271,16 @@ void EnemyBT::flee(float deltaTime, Grid& grid)
 
 	if (velocity.y > 0)
 	{
-		if (isWalkable(shape.getGlobalBounds().left, newBounds.top + newBounds.height - 1) &&
-			isWalkable(shape.getGlobalBounds().left + shape.getGlobalBounds().width - 1, newBounds.top + newBounds.height - 1))
+		if (isWalkable(shape.getGlobalBounds().left, newBounds.top + newBounds.height + 2) &&
+			isWalkable(shape.getGlobalBounds().left + shape.getGlobalBounds().width, newBounds.top + newBounds.height + 2))
 		{
 			shape.move(Vector2f(0, velocity.y * deltaTime));	
 		}
 	}
 	else
 	{
-		if (isWalkable(shape.getGlobalBounds().left, newBounds.top) &&
-			isWalkable(shape.getGlobalBounds().left + shape.getGlobalBounds().width - 1, newBounds.top))
+		if (isWalkable(shape.getGlobalBounds().left, newBounds.top - 2) &&
+			isWalkable(shape.getGlobalBounds().left + shape.getGlobalBounds().width - 1, newBounds.top - 2))
 		{
 			shape.move(Vector2f(0, velocity.y * deltaTime));
 		}

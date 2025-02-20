@@ -13,6 +13,7 @@ public:
     static constexpr float SPEED = 100.0f;
     Enemy(float x, float y,float sightRadius,float rangeRadius);
     void update(float deltaTime, Grid& grid) override;
+    virtual void move(Vector2f direction) = 0;
 };
 
 #endif // ENEMY_HPP
