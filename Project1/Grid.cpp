@@ -3,7 +3,7 @@
 #include <iostream>
 
 Grid::Grid() {
-    cells.resize(GRID_HEIGHT, std::vector<Cell>(GRID_WIDTH, { true,true, { 0, 0 }, sf::RectangleShape(sf::Vector2f(CELL_SIZE, CELL_SIZE)) }));
+    cells.resize(GRID_HEIGHT, std::vector<Cell>(GRID_WIDTH, { true,false, { 0, 0 }, sf::RectangleShape(sf::Vector2f(CELL_SIZE, CELL_SIZE)) }));
     for (int y = 0; y < GRID_HEIGHT; ++y) {
         for (int x = 0; x < GRID_WIDTH; ++x) {
             cells[y][x].position = sf::Vector2f(x * CELL_SIZE, y * CELL_SIZE);
@@ -34,7 +34,18 @@ void Grid::loadFromFile(const std::string& filename) {
             }
         }
     }
+
+    for (int y = 0; y < GRID_HEIGHT; y++) {
+        for (int x = 0; x < GRID_WIDTH; x++) {
+            if (cells[y][x].Ewalkable) {
+                cout << "0";
+            }
+            else cout << "1";
+        }
+        cout << endl;
+    }
 }
+
 
 void Grid::draw(sf::RenderWindow& window) {
     for (int y = 0; y < GRID_HEIGHT; ++y) {
@@ -56,6 +67,10 @@ vector<vector<bool>> Grid::getWalkable()
 		for (int j = 0; j < GRID_WIDTH; j++)
 		{
 			if (cells[i][j].walkable == false)
+			{
+				walkables[i][j] = false;
+			}
+            if (cells[i][j].Ewalkable == false)
 			{
 				walkables[i][j] = false;
 			}
