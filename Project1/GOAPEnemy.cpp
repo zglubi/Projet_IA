@@ -3,8 +3,7 @@ unique_ptr<Pathfinding> pathfinding;
 vector<Vector2f> patrolPath;
 vector<Vector2i> path;
 Clock attackCD;
-int iterator_sizeofradius=0;
-float sightDetectionRadius2 = 100;
+
 bool State::getisAttacked() const { return isAttacked; } void State::setisAttacked(bool attack) { isAttacked = attack; }
 bool State::getplayerInSight() { return playerInSight; } void State::setplayerInSight(bool sight) { playerInSight = sight; }
 bool State::getplayerInRange() { return playerInRange; } void State::setplayerInRange(bool range) { playerInRange = range; }
@@ -22,13 +21,6 @@ void Action::settotalCost(int i) { totalcost = i; }
 void Action::increasetotalCost(int i) { totalcost += i; }
 void Action::decreasetotalCost(int i) { totalcost -= i; }
 
-bool PatrolAction::canExecute(State& state) {
-    return !state.getplayerInRange();
-}
-void PatrolAction::execute(State& state, RectangleShape& shape, Vector2f playerPos, shared_ptr<Player> player,Grid& grid) {
-    cout << "L'agent patrouille.\n";
-    //patrol();
-}
 
 bool FollowAction::canExecute(State& state) {
     return state.getplayerInSight();
@@ -111,7 +103,7 @@ void FleeAction::execute(State& state, RectangleShape& shape, Vector2f playerPos
     auto isWalkable = [&](float x, float y) {
         int gridX = static_cast<int>(x / CELL_SIZE);
         int gridY = static_cast<int>(y / CELL_SIZE);
-        return gridX >= 0 && gridX < GRID_WIDTH && gridY >= 0 && gridY < GRID_HEIGHT && grid.getCell(gridX, gridY).walkable;
+        return gridX >= 0 && gridX < GRID_WIDTH && gridY >= 0 && gridY < GRID_HEIGHT && grid.getCell(gridX, gridY).Ewalkable;
         };
 
 
@@ -157,7 +149,7 @@ void FleeAction::execute(State& state, RectangleShape& shape, Vector2f playerPos
         shape.move(Vector2f(velocity.x * 0.016, velocity.y * 0.016));
     }*/
     if (attackCD.getElapsedTime().asSeconds() > 5) {
-        state.decreaseHp(2);// chiffres a equilibrer
+        state.decreaseHp(3);// chiffres a equilibrer
         attackCD.restart();
     }
     state.setlowHealth(false);
@@ -170,11 +162,6 @@ vector<Action*> GOAPPlanner::Plan(State& state, Goal goal)
     // SEUIL CRITIQUE N°1 (hp>10)
     if (state.getHp() > 10) {
         goal = Goal::Flee;
-    }
-    if (goal == Goal::Patrol) {
-        if (!state.getplayerInSight() and !state.getplayerInRange()) {
-            plan.push_back(new PatrolAction());
-        }
     }
     if (goal == Goal::Follow) {
         if (state.getplayerInSight() and !state.getplayerInRange())
@@ -246,57 +233,54 @@ bool GOAPEnemy::isColliding(shared_ptr<Player> player) {
 
 void GOAPAgent::PerformActions(State& state,RectangleShape& shape, Vector2f playerPos, shared_ptr<Player> player, Grid& grid) {
     
-    int totalCost1 = 0, totalCost2 = 0, totalCost3 = 0;
-    Goal goal1 = Goal::Patrol;
-    Goal goal2 = Goal::Follow;
-    Goal goal3 = Goal::Attack;
+    int totalCost1 = 0, totalCost2 = 0;
+    
+    Goal goal1 = Goal::Follow;
+    Goal goal2 = Goal::Attack;
 
     vector<Action*> plan1 = planner.Plan(state, goal1);
     vector<Action*> plan2 = planner.Plan(state, goal2);
-    vector<Action*> plan3 = planner.Plan(state, goal3);
+    
 
     for (auto action : plan1) {
         totalCost1 += action->gettotalCost();
         if (state.getlowHealth()) {
-            totalCost1 += 1; // moins enclin à patrol si bas en vie, mais prefere patrol que follow si bas en vie
+            totalCost1 += 2;// moins enclin a follow si bas en vie
+        }
+        if (state.getplayerInRange()) {
+            totalCost1 += 2; // si peut attaquer, préfère attaquer mais ne plus follow
+        }
+        if (state.getplayerInSight()) {
+            totalCost1 -= 5; // envie (frénétique) de follow à vue
         }
     }
     for (auto action : plan2) {
         totalCost2 += action->gettotalCost();
         if (state.getlowHealth()) {
-            totalCost1 += 2;// moins enclin a follow si bas en vie
-        }
-        if (state.getplayerInRange()) {
-            totalCost2 += 2; // si peut attaquer, préfère attaquer mais ne plus follow
-        }
-        if (state.getplayerInSight()) {
-            totalCost2 -= 5; // envie (frénétique) de follow à vue
-        }
-    }
-    for (auto action : plan3) {
-        totalCost2 += action->gettotalCost();
-        if (state.getlowHealth()) {
-            totalCost1 += 2; // moins enclin à attaquer si bas en vie
+            totalCost2 += 2; // moins enclin à attaquer si bas en vie
         }
         else if (!state.getlowHealth() and state.getplayerInRange()) {
-            totalCost3 -= 50; // si pas bas en vie et an range, volonté, d'attaquer, à 100%
+            totalCost2 -= 50; // si pas bas en vie et an range, volonté, d'attaquer, à 100%
         }
     }
-    //if (totalCost1 < totalCost2 and totalCost1 < totalCost3) {
+    if (totalCost1 < totalCost2) {
 
-    //for (auto action : plan1) {
-    //    if (action->canExecute(state)) {
-    //        action->execute(state,shape,playerPos,player);  // Exécute l'action
-    //    }
-    //    else {
-    //        cout << "Action impossible : " << typeid(*action).name() << "\n";
-    //    }
-    //    delete action;  // Libérer la mémoire
-    //}
-    //}
-    if (totalCost2 < totalCost1 and totalCost2 < totalCost3) {
+        for (auto action : plan1) {
+            if (action->canExecute(state)) {
+                cout << "follow";
+
+                action->execute(state, shape, playerPos, player, grid);  // Exécute l'action
+            }
+            else {
+                cout << "Action impossible : " << typeid(*action).name() << "\n";
+            }
+            delete action;  // Libérer la mémoire
+        }
+    }
+    if (totalCost2 < totalCost1) {
         for (auto action : plan2) {
             if (action->canExecute(state)) {
+                cout << "atk";
                 action->execute(state, shape, playerPos,player,grid);  // Exécute l'action
             }
             else {
@@ -305,17 +289,8 @@ void GOAPAgent::PerformActions(State& state,RectangleShape& shape, Vector2f play
             delete action;  // Libérer la mémoire
         }
     }
-    else if (totalCost3 < totalCost1 and totalCost3 < totalCost2) {
-        for (auto action : plan3) {
-            if (action->canExecute(state)) {
-                action->execute(state, shape, playerPos,player,grid);  // Exécute l'action
-            }
-            else {
-                cout << "Action impossible : " << typeid(*action).name() << "\n";
-            }
-            delete action;  // Libérer la mémoire
-        }
-    }
+	//cout << "Total cost 1: " << totalCost1 << "\n";
+	//cout << "Total cost 2: " << totalCost2 << "\n";
 }
 
 bool GOAPEnemy::detectPlayer(shared_ptr<Player> player) {
@@ -435,7 +410,7 @@ bool isPathClear(const Vector2i& start, const Vector2i& end, Grid& grid)
 
     while (true) {
         // Vérifiez si la cellule est un mur
-        if (!grid.getCell(x1, y1).walkable) {
+        if (!grid.getCell(x1, y1).Ewalkable) {
             return false;
         }
 
