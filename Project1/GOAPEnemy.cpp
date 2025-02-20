@@ -290,8 +290,8 @@ void GOAPAgent::PerformActions(State& state,RectangleShape& shape, Vector2f play
             delete action;  // Libérer la mémoire
         }
     }
-	cout << "Total cost 1: " << totalCost1 << "\n";
-	cout << "Total cost 2: " << totalCost2 << "\n";
+	//cout << "Total cost 1: " << totalCost1 << "\n";
+	//cout << "Total cost 2: " << totalCost2 << "\n";
 }
 
 bool GOAPEnemy::detectPlayer(shared_ptr<Player> player) {
