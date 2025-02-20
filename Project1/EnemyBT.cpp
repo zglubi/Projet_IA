@@ -89,21 +89,21 @@ void EnemyBT::patrol(float deltaTime, Grid& grid)
 	if (isPatroling)
 	{
 
-		// Vérifiez si l'ennemi a atteint le point de patrouille actuel
-		if (availablePatrolPath.size() > 0) {
-		if (length(Vector2f(availablePatrolPath[currentPathIndex].x - shape.getPosition().x, availablePatrolPath[currentPathIndex].y - shape.getPosition().y)) < 5.0f) {
-			// Passez au point de patrouille suivant
+		if (availablePatrolPath.size() > 0) 
+		{
+		
+			if (length(Vector2f(availablePatrolPath[currentPathIndex].x - shape.getPosition().x, availablePatrolPath[currentPathIndex].y - shape.getPosition().y)) < 5.0f)
+			{
 			currentPathIndex = (currentPathIndex + 1) % availablePatrolPath.size();
+		
+			}
+
+			Vector2f direction = Vector2f(availablePatrolPath[currentPathIndex].x - shape.getPosition().x, availablePatrolPath[currentPathIndex].y - shape.getPosition().y);
+			direction = direction / length(direction);
+
+			velocity = direction * SPEED;
+			shape.move(velocity * deltaTime);
 		}
-
-		// Calculez la direction vers le point de patrouille actuel
-		Vector2f direction = Vector2f(availablePatrolPath[currentPathIndex].x - shape.getPosition().x, availablePatrolPath[currentPathIndex].y - shape.getPosition().y);
-		direction = direction / length(direction);
-
-		// Mettez à jour la vitesse et déplacez l'ennemi
-		velocity = direction * SPEED;
-		shape.move(velocity * deltaTime);
-	}
 	}
 	else
 	{
@@ -128,27 +128,6 @@ void EnemyBT::patrol(float deltaTime, Grid& grid)
 				}
 				else
 				{
-					for (int i = 0; i < GRID_HEIGHT; i++)
-					{
-						for (int j = 0; j < GRID_WIDTH; j++)
-						{
-							if (grid.getCell(j, i).walkable == false)
-							{
-								grid.getCell(j, i).shape.setFillColor(sf::Color::White);
-							}
-							else
-							{
-								grid.getCell(j, i).shape.setFillColor(sf::Color::Black);
-							}
-						}
-					}
-
-					for (auto cell : path)
-					{
-						grid.getCell(cell.x, cell.y).shape.setFillColor(sf::Color::Green);
-					}
-
-
 					if (position != Vector2i(shape.getPosition().x / 40, shape.getPosition().y / 40))
 					{
 						position = Vector2i(shape.getPosition().x / 40, shape.getPosition().y / 40);
@@ -278,7 +257,8 @@ void EnemyBT::flee(float deltaTime, Grid& grid)
 		if (isWalkable(newBounds.left + newBounds.width - 1, shape.getGlobalBounds().top) &&
 			isWalkable(newBounds.left + newBounds.width - 1, shape.getGlobalBounds().top + shape.getGlobalBounds().height - 1))
 		{
-			shape.move(Vector2f(velocity.x * deltaTime, 0));		}
+			shape.move(Vector2f(velocity.x * deltaTime, 0));		
+		}
 	}
 	else
 	{

@@ -22,10 +22,45 @@ void Player::update(float deltaTime, Grid& grid) {
         };
 
 
-    if (isWalkable(newBounds.left, newBounds.top) &&
-        isWalkable(newBounds.left + newBounds.width - 1, newBounds.top) &&
-        isWalkable(newBounds.left, newBounds.top + newBounds.height - 1) &&
-        isWalkable(newBounds.left + newBounds.width - 1, newBounds.top + newBounds.height - 1)) {
-        shape.move(movement);
+    if (movement.x > 0)
+    {
+        if (isWalkable(newBounds.left + newBounds.width + 2, shape.getGlobalBounds().top) &&
+            isWalkable(newBounds.left + newBounds.width + 2, shape.getGlobalBounds().top + shape.getGlobalBounds().height))
+        {
+            shape.move(movement.x, 0);
+        }
     }
+    else
+    {
+        if (isWalkable(newBounds.left - 2, shape.getGlobalBounds().top) &&
+            isWalkable(newBounds.left - 2, shape.getGlobalBounds().top + shape.getGlobalBounds().height))
+        {
+            shape.move(movement.x, 0);
+        }
+    }
+
+    if (movement.y > 0)
+    {
+        if (isWalkable(shape.getGlobalBounds().left, newBounds.top + newBounds.height + 2) &&
+            isWalkable(shape.getGlobalBounds().left + shape.getGlobalBounds().width - 1, newBounds.top + newBounds.height + 2))
+        {
+            shape.move(0, movement.y);
+        }
+    }
+    else
+    {
+        if (isWalkable(shape.getGlobalBounds().left, newBounds.top - 2) &&
+            isWalkable(shape.getGlobalBounds().left + shape.getGlobalBounds().width, newBounds.top - 2))
+        {
+            shape.move(0, movement.y);
+        }
+    }
+
+
+    //if (isWalkable(newBounds.left, newBounds.top) &&
+    //    isWalkable(newBounds.left + newBounds.width - 1, newBounds.top) &&
+    //    isWalkable(newBounds.left, newBounds.top + newBounds.height - 1) &&
+    //    isWalkable(newBounds.left + newBounds.width - 1, newBounds.top + newBounds.height - 1)) {
+    //    shape.move(movement);
+    //}
 }
