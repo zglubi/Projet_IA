@@ -25,7 +25,7 @@ int main() {
     Blackboard blackboard;
     Grid grid;
 
-    shared_ptr<Player> player = make_shared<Player>(200, 400);
+    shared_ptr<Player> player = make_shared<Player>(400, 200);
     vector<shared_ptr<EnemyBT>> enemies = {
         make_shared<EnemyBT>(520, 520,100,50, blackboard, grid, player)/*,
         make_shared<EnemyBT>(700, 100, blackboard, grid, player)*/

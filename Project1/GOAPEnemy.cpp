@@ -3,8 +3,7 @@ unique_ptr<Pathfinding> pathfinding;
 vector<Vector2f> patrolPath;
 vector<Vector2i> path;
 Clock attackCD;
-int iterator_sizeofradius=0;
-float sightDetectionRadius2 = 100;
+
 bool State::getisAttacked() const { return isAttacked; } void State::setisAttacked(bool attack) { isAttacked = attack; }
 bool State::getplayerInSight() { return playerInSight; } void State::setplayerInSight(bool sight) { playerInSight = sight; }
 bool State::getplayerInRange() { return playerInRange; } void State::setplayerInRange(bool range) { playerInRange = range; }
@@ -104,7 +103,7 @@ void FleeAction::execute(State& state, RectangleShape& shape, Vector2f playerPos
     auto isWalkable = [&](float x, float y) {
         int gridX = static_cast<int>(x / CELL_SIZE);
         int gridY = static_cast<int>(y / CELL_SIZE);
-        return gridX >= 0 && gridX < GRID_WIDTH && gridY >= 0 && gridY < GRID_HEIGHT && grid.getCell(gridX, gridY).walkable;
+        return gridX >= 0 && gridX < GRID_WIDTH && gridY >= 0 && gridY < GRID_HEIGHT && grid.getCell(gridX, gridY).Ewalkable;
         };
 
 
@@ -150,7 +149,7 @@ void FleeAction::execute(State& state, RectangleShape& shape, Vector2f playerPos
         shape.move(Vector2f(velocity.x * 0.016, velocity.y * 0.016));
     }*/
     if (attackCD.getElapsedTime().asSeconds() > 5) {
-        state.decreaseHp(2);// chiffres a equilibrer
+        state.decreaseHp(3);// chiffres a equilibrer
         attackCD.restart();
     }
     state.setlowHealth(false);
@@ -411,7 +410,7 @@ bool isPathClear(const Vector2i& start, const Vector2i& end, Grid& grid)
 
     while (true) {
         // Vérifiez si la cellule est un mur
-        if (!grid.getCell(x1, y1).walkable) {
+        if (!grid.getCell(x1, y1).Ewalkable) {
             return false;
         }
 
