@@ -457,3 +457,8 @@ bool isPathClear(const Vector2i& start, const Vector2i& end, Grid& grid)
 
     return true;
 }
+
+void GOAPEnemy::enemyMove(Vector2f direction, Grid& grid)
+{
+
+}

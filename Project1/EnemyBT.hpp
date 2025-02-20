@@ -35,7 +35,7 @@ public:
 	void flee(float deltaTime, Grid& grid);
 
 	bool isPathClear(const Vector2i& start, const Vector2i& end, Grid& grid);
-	void move(Vector2f direction) override;
+	void enemyMove(Vector2f direction, Grid& grid) override;
 };
 
 
