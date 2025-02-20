@@ -106,8 +106,8 @@ public:
 
 class GOAPEnemy : public Enemy {
 private:
-	float sightDetectionRadius,rangeDetectionRadius;
 public:
+    float sightDetectionRadius, rangeDetectionRadius;
     Clock damageClock, researchPlayer, attackClock;
     bool reversed=false;
 	State state;
@@ -136,5 +136,4 @@ bool isPathClear(const Vector2i& start, const Vector2i& end, Grid& grid);
 extern unique_ptr<Pathfinding> pathfinding;
 extern vector<Vector2f> patrolPath;
 extern vector<Vector2i> path;
-
 #endif

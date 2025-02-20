@@ -3,7 +3,8 @@ unique_ptr<Pathfinding> pathfinding;
 vector<Vector2f> patrolPath;
 vector<Vector2i> path;
 Clock attackCD;
-
+int iterator_sizeofradius=0;
+float sightDetectionRadius2 = 100;
 bool State::getisAttacked() const { return isAttacked; } void State::setisAttacked(bool attack) { isAttacked = attack; }
 bool State::getplayerInSight() { return playerInSight; } void State::setplayerInSight(bool sight) { playerInSight = sight; }
 bool State::getplayerInRange() { return playerInRange; } void State::setplayerInRange(bool range) { playerInRange = range; }
@@ -31,7 +32,8 @@ void PatrolAction::execute(State& state, RectangleShape& shape, Vector2f playerP
 
 bool FollowAction::canExecute(State& state) {
     return state.getplayerInSight();
-}void FollowAction::execute(State& state, RectangleShape& shape, Vector2f playerPos, shared_ptr<Player> player, Grid& grid) {
+}
+void FollowAction::execute(State& state, RectangleShape& shape, Vector2f playerPos, shared_ptr<Player> player, Grid& grid) {
     static bool next = false;
     Vector2f velocity;
     Vector2i position;
@@ -154,7 +156,7 @@ void FleeAction::execute(State& state, RectangleShape& shape, Vector2f playerPos
         isWalkable(newBounds.left + newBounds.width - 1, newBounds.top + newBounds.height - 1)) {
         shape.move(Vector2f(velocity.x * 0.016, velocity.y * 0.016));
     }*/
-    if (attackCD.getElapsedTime().asSeconds() > 10) {
+    if (attackCD.getElapsedTime().asSeconds() > 5) {
         state.decreaseHp(2);// chiffres a equilibrer
         attackCD.restart();
     }
@@ -163,6 +165,7 @@ void FleeAction::execute(State& state, RectangleShape& shape, Vector2f playerPos
 
 vector<Action*> GOAPPlanner::Plan(State& state, Goal goal)
 {
+
     vector<Action*> plan;
     // SEUIL CRITIQUE N°1 (hp>10)
     if (state.getHp() > 10) {
@@ -206,7 +209,6 @@ GOAPEnemy::GOAPEnemy(float x, float y, float sightRadius, float rangeRadius)
     shape.setOutlineColor(Color::Yellow); shape.setOutlineThickness(2); 
 }
 
-
 void GOAPEnemy::update(Grid& grid, shared_ptr<Player> player){
  //   if (player.shape.getGlobalBounds().intersects(shape.getGlobalBounds())) { // to be removed
 	//	if (damageClock.getElapsedTime().asSeconds() > 1) {
@@ -218,21 +220,19 @@ void GOAPEnemy::update(Grid& grid, shared_ptr<Player> player){
  //           damageClock.restart();
 	//	}
 	//}
+    sightRadiusCircle.setRadius(sightDetectionRadius);
+    rangeRadiusCircle.setRadius(rangeDetectionRadius);
     sightRadiusCircle.setPosition(shape.getPosition().x, shape.getPosition().y);
     rangeRadiusCircle.setPosition(shape.getPosition().x, shape.getPosition().y);
     if (detectPlayer(player)) { state.setplayerInSight(true); } else  state.setplayerInSight(false);
     if (detectRangePlayer(player)) { state.setplayerInRange(true); }else state.setplayerInRange(false);
 
 
-
     color(state.getHp());
-    if (state.getHp() >= 11) {
+    if (state.getHp() > 10) {
         state.setlowHealth(true);
     }
     else { state.setlowHealth(false); }
-
-
-
 
     agent.PerformActions(state,shape,player->shape.getPosition(),player,grid);
 
