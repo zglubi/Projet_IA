@@ -131,6 +131,7 @@ public:
     void follow(Vector2f playerPos);
     void flee(Vector2f);
     void color(int i);
+    void move(Vector2f direction) override;
 };
 bool isPathClear(const Vector2i& start, const Vector2i& end, Grid& grid);
 extern unique_ptr<Pathfinding> pathfinding;
