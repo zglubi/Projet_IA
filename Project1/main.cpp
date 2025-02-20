@@ -25,9 +25,16 @@ int main() {
     Blackboard blackboard;
     Grid grid;
 
+    vector<Vector2f> patrolPath1;
+    patrolPath1.push_back(Vector2f(540, 540));
+    patrolPath1.push_back(Vector2f(680, 540));
+    patrolPath1.push_back(Vector2f(680, 700));
+    patrolPath1.push_back(Vector2f(540, 700));
+    patrolPath1.push_back(Vector2f(540, 540));
+
     shared_ptr<Player> player = make_shared<Player>(400, 200);
     vector<shared_ptr<EnemyBT>> enemies = {
-        make_shared<EnemyBT>(520, 520,100,50, blackboard, grid, player)/*,
+        make_shared<EnemyBT>(520, 520,100,50, blackboard, grid, player, patrolPath1)/*,
         make_shared<EnemyBT>(700, 100, blackboard, grid, player)*/
     };
     vector<GOAPEnemy> GOAPenemies = { GOAPEnemy(200,100,100,50), GOAPEnemy(720,200,100,50) };

@@ -32,7 +32,9 @@ vector<sf::Vector2i> Pathfinding::findPath(Grid& grid, sf::Vector2i start, sf::V
             return path;
         }
 
-        visited[current->position.y][current->position.x] = true;
+        if (current->position.x >= 0 && current->position.x < GRID_WIDTH && current->position.y >= 0 && current->position.y < GRID_HEIGHT)
+            visited[current->position.y][current->position.x] = true;
+        else return {};
 
         vector<Vector2i> neighbors;
             neighbors = {
