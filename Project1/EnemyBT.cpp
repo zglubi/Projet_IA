@@ -310,9 +310,13 @@ bool EnemyBT::isPathClear(const Vector2i& start, const Vector2i& end, Grid& grid
 
 	while (true) {
 		// Vérifiez si la cellule est un mur
-		if (!grid.getCell(x1, y1).walkable) {
-			return false;
+		if (x1 >= 0 && x1 < GRID_WIDTH && y1 >= 0 && y1 < GRID_HEIGHT) {
+
+			if (!grid.getCell(x1, y1).walkable) {
+				return false;
+			}
 		}
+		else return false;
 
 		// Si nous avons atteint la fin du chemin
 		if (x1 == x2 && y1 == y2) {
