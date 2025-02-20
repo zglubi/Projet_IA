@@ -45,7 +45,7 @@ vector<sf::Vector2i> Pathfinding::findPath(Grid& grid, sf::Vector2i start, sf::V
         for (sf::Vector2i& neighborPos : neighbors) {
             if (neighborPos.x < 0 || neighborPos.x >= GRID_WIDTH || neighborPos.y < 0 || neighborPos.y >= GRID_HEIGHT)
                 continue;
-            if (grid.getCell(neighborPos.x, neighborPos.y).walkable == false || visited[neighborPos.y][neighborPos.x])
+            if (grid.getCell(neighborPos.x, neighborPos.y).Ewalkable == false || visited[neighborPos.y][neighborPos.x])
                 continue;
             for (auto& n : openList) {
                 if (n->position == neighborPos) {

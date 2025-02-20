@@ -22,6 +22,7 @@ private:
 	int currentPathIndex = 0;
 	float hp;
 	bool next = false;
+	int action;
 
 public:
 	EnemyBT(float x, float y, float sightRadius, float rangeRadius, Blackboard& bl, Grid& grid, shared_ptr<Player> pl);

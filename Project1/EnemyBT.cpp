@@ -30,6 +30,7 @@ EnemyBT::EnemyBT(float x, float y, float sightRadius, float rangeRadius, Blackbo
 	pathfinding = make_unique<Pathfinding>(grid);
 	hp = 100.0f;
 	player = pl;
+	action = 0;
 
 
 	patrolPath.push_back(Vector2f(400, 400));
@@ -49,17 +50,17 @@ void EnemyBT::update(float deltaTime, Grid& grid)
 	blackboard.SetValue("vue", length(Vector2f(shape.getPosition().x - player->shape.getPosition().x, shape.getPosition().y - player->shape.getPosition().y)));
 	
 	
-	int action = 0;
+	action = 0;
 	root->execute(action);
 
 	switch (action)
 	{
-	case 1:
-		patrol(deltaTime, grid);
-		break;
 	case 2:
 		isPatroling = false;
 		chase(deltaTime, grid);
+		break;
+	case 1:
+		patrol(deltaTime, grid);
 		break;
 	case 3:
 		isPatroling = false;
@@ -191,6 +192,12 @@ void EnemyBT::chase(float deltaTime, Grid& grid)
 	}
 	else
 	{
+		path = pathfinding->findPath(grid, Vector2i(shape.getPosition().x / 40, shape.getPosition().y / 40), Vector2i(player->shape.getPosition().x / 40, player->shape.getPosition().y / 40));
+		if (path.size() == 0)
+		{
+			action = 1;
+			return;
+		}
 		if (position != Vector2i(shape.getPosition().x / 40, shape.getPosition().y / 40))
 		{
 			position = Vector2i(shape.getPosition().x / 40, shape.getPosition().y / 40);
@@ -213,7 +220,6 @@ void EnemyBT::chase(float deltaTime, Grid& grid)
 		}
 		else if (next)
 		{
-			path = pathfinding->findPath(grid, Vector2i(shape.getPosition().x / 40, shape.getPosition().y / 40), Vector2i(player->shape.getPosition().x / 40, player->shape.getPosition().y / 40));
 
 			Vector2f direction;
 			if (path.size() > 1)
