@@ -58,8 +58,6 @@ int main() {
         window.draw(player->shape);
         for (const auto& enemy : enemies) {
             window.draw(enemy->shape);
-            window.draw(enemy->rangeRadiusCircle);
-            window.draw(enemy->sightRadiusCircle);
         }
         
         for (const auto& enemy : GOAPenemies) {
