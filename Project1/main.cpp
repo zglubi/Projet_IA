@@ -32,10 +32,16 @@ int main() {
     patrolPath1.push_back(Vector2f(540, 700));
     patrolPath1.push_back(Vector2f(540, 540));
 
+    patrolPath2.push_back(Vector2f(100, 520));
+    patrolPath2.push_back(Vector2f(240, 520));
+    patrolPath2.push_back(Vector2f(240, 720));
+    patrolPath2.push_back(Vector2f(100, 720));
+    patrolPath2.push_back(Vector2f(100, 520));
+
     shared_ptr<Player> player = make_shared<Player>(400, 200);
     vector<shared_ptr<EnemyBT>> enemies = {
-        make_shared<EnemyBT>(520, 520,100,50, blackboard, grid, player, patrolPath1),
-        make_shared<EnemyBT>(100, 600,100,50, blackboard, grid, player,patrolPath2)
+        make_shared<EnemyBT>(520, 520,150,50, blackboard, grid, player, patrolPath1),
+        make_shared<EnemyBT>(100, 600,150,50, blackboard, grid, player,patrolPath2)
     };
     vector<GOAPEnemy> GOAPenemies = { GOAPEnemy(200,100,100,50), GOAPEnemy(680,200,150,50) };
     grid.loadFromFile("map.txt");
@@ -69,8 +75,6 @@ int main() {
         
         for (const auto& enemy : GOAPenemies) {
             window.draw(enemy.shape);
-            window.draw(enemy.rangeRadiusCircle);
-            window.draw(enemy.sightRadiusCircle);
         }
 
         window.display();

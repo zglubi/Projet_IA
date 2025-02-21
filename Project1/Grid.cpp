@@ -34,16 +34,6 @@ void Grid::loadFromFile(const std::string& filename) {
             }
         }
     }
-
-    for (int y = 0; y < GRID_HEIGHT; y++) {
-        for (int x = 0; x < GRID_WIDTH; x++) {
-            if (cells[y][x].Ewalkable) {
-                cout << "0";
-            }
-            else cout << "1";
-        }
-        cout << endl;
-    }
 }
 
 

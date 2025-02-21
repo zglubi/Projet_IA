@@ -20,7 +20,7 @@ EnemyBT::EnemyBT(float x, float y, float sightRadius, float rangeRadius, Blackbo
 	chaseSelect->AddChild(move(chaseSequence));
 	chaseSelect->AddChild(move(fleeAction));
 
-	auto vueCondition = make_unique<ConditionNode>(blackboard, "vue", 150);
+	auto vueCondition = make_unique<ConditionNode>(blackboard, "vue", sightRadius);
 	auto vueSequence = make_unique<SequenceNode>();
 	vueSequence->AddChild(move(vueCondition));
 	vueSequence->AddChild(move(chaseSelect));
